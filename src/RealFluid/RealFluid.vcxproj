@@ -19,8 +19,8 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{BC0F7B9B-62FA-425D-95FA-E09393704D04}</ProjectGuid>
-    <RootNamespace>RealFluidCore</RootNamespace>
+    <ProjectGuid>{3A31F14F-E7B6-4F88-9AA9-6B5907C65AD3}</ProjectGuid>
+    <RootNamespace>RealFluid</RootNamespace>
     <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
