@@ -7,7 +7,7 @@ using namespace std;
 class Grid
 {
     public:
-    Grid(int width, int height, int cellDimensions = 20);
+    Grid(int width, int height, int cellDimensions);
     virtual ~Grid();
 
     vector<FluidCell> Cells;

@@ -21,9 +21,11 @@ void Grid::ConstructGrid()
         for (auto j = 0; j < yDiv; j++)
         {
             FluidCell cell;
-            cell.X = xDiv * i;
-            cell.Y = yDiv * j;
+            cell.X = CellDimensions * i;
+            cell.Y = CellDimensions * j;
             cell.Z = 0;
+
+            cell.Width = cell.Height = CellDimensions;
 
             cell.Type = Empty;
 

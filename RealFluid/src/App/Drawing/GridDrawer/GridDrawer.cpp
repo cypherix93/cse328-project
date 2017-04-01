@@ -10,24 +10,26 @@ void DrawCellGrid(Grid grid)
 
 void DrawCell(FluidCell cell)
 {
-    auto position = cell.GetPosition();
-    auto pos_p = &position[0];
+    int x, y;
 
-    glBegin(GL_LINES);
+    x = cell.X;
+    y = cell.Y;
 
-    glVertex3iv(pos_p);
-    
-    position[0] += cell.Width;
-    glVertex3iv(pos_p);
+    glBegin(GL_LINE_LOOP);
 
-    position[1] += cell.Height;
-    glVertex3iv(pos_p);
+    glVertex2i(x, y);
 
-    position[0] -= cell.Width;
-    glVertex3iv(pos_p);
+    x += cell.Width;
+    glVertex2i(x, y);
 
-    position[1] -= cell.Height;
-    glVertex3iv(pos_p);
+    y += cell.Height;
+    glVertex2i(x, y);
+
+    x -= cell.Width;
+    glVertex2i(x, y);
+
+    y -= cell.Height;
+    glVertex2i(x, y);
 
     glEnd();
 }
