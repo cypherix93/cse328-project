@@ -18,15 +18,14 @@ class FluidCell
     FluidCell();
     virtual ~FluidCell();
 
-    vector<float> GetPosition();
-    vector<float> GetDimensions();
-
-    protected:
     FluidCellType Type;
 
-    float X, Y, Z;
-    float Width, Height;
+    int X, Y, Z;
+    int Width, Height;
 
     float U, V, W;
+
+    vector<float> GetPosition();
+    vector<float> GetDimensions();
 };
 
