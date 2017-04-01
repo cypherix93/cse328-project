@@ -22,7 +22,7 @@ void InitHandler()
 
 void DrawHandler()
 {
-    glClearColor(0.0f, 0.15f, 0.25f, 1.0f);
+    glClearColor(0.0f, 0.10f, 0.20f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     glMatrixMode(GL_MODELVIEW);
@@ -34,7 +34,6 @@ void DrawHandler()
 
 //    glLineWidth(2.0f);
 
-    glColor4f(1.0f, 1.0f, 1.0f, 0.2f);
     DrawCellGrid(*CELL_GRID);
 }
 

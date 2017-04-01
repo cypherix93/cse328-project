@@ -16,7 +16,7 @@ class FluidCell
 {
     public:
     FluidCell();
-    virtual ~FluidCell();
+    ~FluidCell();
 
     FluidCellType Type;
 

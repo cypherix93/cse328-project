@@ -27,7 +27,8 @@ void Grid::ConstructGrid()
 
             cell.Width = cell.Height = CellDimensions;
 
-            cell.Type = Empty;
+            if (j < 2)
+                cell.Type = Solid;
 
             Cells.push_back(cell);
         }
