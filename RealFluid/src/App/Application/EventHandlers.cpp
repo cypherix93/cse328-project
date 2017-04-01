@@ -27,7 +27,10 @@ void InitHandler()
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
 
-    gluPerspective(45.0, (double)WINDOW_WIDTH / (double)WINDOW_HEIGHT, 1.0, 200.0);
+    gluPerspective(45.0, (static_cast<double>(WINDOW_WIDTH) / static_cast<double>(WINDOW_HEIGHT)), 1.0, 200.0);
+
+    CELL_GRID = new Grid{ WINDOW_WIDTH, WINDOW_HEIGHT };
+    CELL_GRID->ConstructGrid();
 }
 
 void DrawHandler()
@@ -43,8 +46,9 @@ void DrawHandler()
     glRotatef(_angleY, 0.0f, 1.0f, 0.0f);*/
 
     glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-
     glLineWidth(4.0f);
+
+    DrawCellGrid(*CELL_GRID);
 }
 
 // Called when a keyboard key is pressed
