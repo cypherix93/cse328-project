@@ -1,6 +1,6 @@
 #pragma once
 #include <vector>
-#include "src/Core/Fluid/Cell/FluidCell.h"
+#include "../Cell/FluidCell.h"
 
 using namespace std;
 

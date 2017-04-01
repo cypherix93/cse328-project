@@ -19,8 +19,8 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="GridManager.cpp" />
-    <ClCompile Include="src\Core\Fluid\Cell\FluidCell.cpp" />
+    <ClCompile Include="src\Core\Fluid\Grid\GridManager\GridManager.cpp" />
+    <ClCompile Include="src\Core\Fluid\Grid\Cell\FluidCell.cpp" />
     <ClCompile Include="src\App\Application\Application.cpp" />
     <ClCompile Include="src\App\Application\EventHandlers.cpp" />
     <ClCompile Include="src\Main.cpp" />
@@ -28,8 +28,8 @@
     <ClCompile Include="src\Core\Window\WindowManager\WindowManager.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="GridManager.h" />
-    <ClInclude Include="src\Core\Fluid\Cell\FluidCell.h" />
+    <ClInclude Include="src\Core\Fluid\Grid\GridManager\GridManager.h" />
+    <ClInclude Include="src\Core\Fluid\Grid\Cell\FluidCell.h" />
     <ClInclude Include="src\App\Application\Application.h" />
     <ClInclude Include="src\App\Application\EventHandlers.h" />
     <ClInclude Include="src\Core\StateManager\StateManager.h" />

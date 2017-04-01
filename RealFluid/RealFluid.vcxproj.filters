@@ -27,13 +27,13 @@
     <ClCompile Include="src\App\Application\EventHandlers.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Core\Fluid\Cell\FluidCell.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\Core\Window\WindowManager\WindowManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="GridManager.cpp">
+    <ClCompile Include="src\Core\Fluid\Grid\GridManager\GridManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\Fluid\Grid\Cell\FluidCell.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -47,13 +47,13 @@
     <ClInclude Include="src\App\Application\EventHandlers.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Core\Fluid\Cell\FluidCell.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\Core\Window\WindowManager\WindowManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="GridManager.h">
+    <ClInclude Include="src\Core\Fluid\Grid\GridManager\GridManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\Fluid\Grid\Cell\FluidCell.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
