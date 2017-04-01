@@ -12,10 +12,16 @@ FluidCell::FluidCell()
 
     Width = 0;
     Height = 0;
+    Depth = 0;
 
     Type = Empty;
 }
 
 FluidCell::~FluidCell()
 {
+}
+
+vector<int> FluidCell::GetPosition()
+{
+    return{ X, Y, Z };
 }

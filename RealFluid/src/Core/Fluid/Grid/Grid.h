@@ -4,18 +4,18 @@
 
 using namespace std;
 
-class GridManager
+class Grid
 {
     public:
-    GridManager(int width, int height, int cellDimensions = 20);
-    virtual ~GridManager();
+    Grid(int width, int height, int cellDimensions = 20);
+    virtual ~Grid();
+
+    vector<FluidCell> Cells;
 
     void ConstructGrid();
 
     private:
     int Width, Height;
     int CellDimensions;
-
-    vector<FluidCell> Grid;
 };
 

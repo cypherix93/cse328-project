@@ -21,11 +21,10 @@ class FluidCell
     FluidCellType Type;
 
     int X, Y, Z;
-    int Width, Height;
+    int Width, Height, Depth;
 
     float U, V, W;
 
-    vector<float> GetPosition();
-    vector<float> GetDimensions();
+    vector<int> GetPosition();
 };
 

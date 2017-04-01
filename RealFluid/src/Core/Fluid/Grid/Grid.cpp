@@ -1,17 +1,17 @@
-#include "GridManager.h"
+#include "Grid.h"
 
-GridManager::GridManager(int width, int height, int cellDimensions)
+Grid::Grid(int width, int height, int cellDimensions)
 {
     Width = width;
     Height = height;
     CellDimensions = cellDimensions;
 }
 
-GridManager::~GridManager()
+Grid::~Grid()
 {
 }
 
-void GridManager::ConstructGrid()
+void Grid::ConstructGrid()
 {
     auto xDiv = Width / CellDimensions;
     auto yDiv = Height / CellDimensions;
@@ -27,7 +27,7 @@ void GridManager::ConstructGrid()
 
             cell.Type = Empty;
 
-            Grid.push_back(cell);
+            Cells.push_back(cell);
         }
     }
 }

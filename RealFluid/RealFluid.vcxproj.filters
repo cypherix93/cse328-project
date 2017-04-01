@@ -30,10 +30,13 @@
     <ClCompile Include="src\Core\Window\WindowManager\WindowManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Core\Fluid\Grid\GridManager\GridManager.cpp">
+    <ClCompile Include="GridDrawer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Core\Fluid\Grid\Cell\FluidCell.cpp">
+    <ClCompile Include="src\Core\Fluid\Cell\FluidCell.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\Fluid\Grid\Grid.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -50,10 +53,13 @@
     <ClInclude Include="src\Core\Window\WindowManager\WindowManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Core\Fluid\Grid\GridManager\GridManager.h">
+    <ClInclude Include="GridDrawer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Core\Fluid\Grid\Cell\FluidCell.h">
+    <ClInclude Include="src\Core\Fluid\Cell\FluidCell.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\Fluid\Grid\Grid.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
