@@ -14,6 +14,7 @@ void InitHandler()
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
 
+//    gluPerspective(45.0, (double)WINDOW_WIDTH / (double)WINDOW_HEIGHT, 1.0, 200.0);
     gluOrtho2D(0, WINDOW_WIDTH, 0, WINDOW_HEIGHT);
 
     CELL_GRID = new Grid{ WINDOW_WIDTH, WINDOW_HEIGHT, 40 };
@@ -34,7 +35,9 @@ void DrawHandler()
 
 //    glLineWidth(2.0f);
 
-    DrawCellGrid(*CELL_GRID);
+    GridDrawOptions options;
+//    options.DrawCellOutline = false;
+    DrawCellGrid(*CELL_GRID, &options);
 }
 
 // Called when a keyboard key is pressed

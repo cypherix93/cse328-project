@@ -4,6 +4,7 @@ GridDrawOptions::GridDrawOptions()
 {
     DrawCellContents = true;
     DrawCellOutline = true;
+    DrawCellVectors = true;
 }
 
 GridDrawOptions::~GridDrawOptions()
@@ -17,72 +18,18 @@ void DrawCellGrid(Grid grid, GridDrawOptions* options)
 
     for each (auto cell in grid.Cells)
     {
-        DrawCell(cell, options->DrawCellOutline, options->DrawCellContents);
+        DrawCell(cell, options->DrawCellContents, options->DrawCellOutline, options->DrawCellVectors);
     }
 }
 
-void DrawCell(FluidCell cell, bool drawOutline, bool drawContents)
+void DrawCell(FluidCell cell, bool drawContents, bool drawOutline, bool drawVectors)
 {
-    if (drawOutline)
-        DrawCellOutline(cell);
-
     if (drawContents)
-        DrawCellContents(cell);
-}
+        cell.DrawContents();
 
-void DrawCellOutline(FluidCell cell)
-{
-    auto x = cell.X;
-    auto y = cell.Y;
+    if (drawOutline)
+        cell.DrawOutline();
 
-    glColor4f(1.0f, 1.0f, 1.0f, 0.2f);
-    glBegin(GL_LINE_LOOP);
-
-    glVertex2i(x, y);
-
-    x += cell.Width;
-    glVertex2i(x, y);
-
-    y += cell.Height;
-    glVertex2i(x, y);
-
-    x -= cell.Width;
-    glVertex2i(x, y);
-
-    y -= cell.Height;
-    glVertex2i(x, y);
-
-    glEnd();
-}
-
-void DrawCellContents(FluidCell cell)
-{
-    auto x = cell.X;
-    auto y = cell.Y;
-
-    if (cell.Type == Empty)
-        return;
-
-    if (cell.Type == Solid)
-    {
-        glColor4f(0.48f, 0.28f, 0.0f, 1.0f);
-
-        glBegin(GL_POLYGON);
-
-        glVertex2i(x, y);
-
-        x += cell.Width;
-        glVertex2i(x, y);
-
-        y += cell.Height;
-        glVertex2i(x, y);
-
-        x -= cell.Width;
-        glVertex2i(x, y);
-
-        y -= cell.Height;
-        glVertex2i(x, y);
-
-        glEnd();
-    }
+    if (drawVectors)
+        cell.DrawVectors();
 }

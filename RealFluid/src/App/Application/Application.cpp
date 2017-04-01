@@ -28,7 +28,7 @@ void Application::Start()
     Setup();
 
     // Open GLUT Window
-    _WindowManager->OpenWindow("CSE 328 Assignment 1", WINDOW_WIDTH, WINDOW_HEIGHT);
+    _WindowManager->OpenWindow("Real Fluid - CSE 328 Project", WINDOW_WIDTH, WINDOW_HEIGHT);
 
     // Start Window Lifecycle
     _WindowManager->Start();

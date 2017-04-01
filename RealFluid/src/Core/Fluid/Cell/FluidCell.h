@@ -1,5 +1,6 @@
 #pragma once
 
+#include <GL/glew.h>
 #include <vector>
 
 using namespace std;
@@ -24,7 +25,14 @@ class FluidCell
     int Width, Height, Depth;
 
     float U, V, W;
+    float Pressure;
 
-    vector<int> GetPosition();
+    // Getters
+    vector<int> GetPosition() const;
+
+    // Drawers
+    void DrawContents() const;
+    void DrawOutline() const;
+    void DrawVectors() const;
 };
 

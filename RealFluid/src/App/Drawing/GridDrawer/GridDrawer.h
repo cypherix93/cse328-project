@@ -12,6 +12,7 @@ class GridDrawOptions
 
     bool DrawCellOutline;
     bool DrawCellContents;
+    bool DrawCellVectors;
 };
 
 
@@ -19,6 +20,4 @@ class GridDrawOptions
 void DrawCellGrid(Grid grid, GridDrawOptions* options = nullptr);
 
 /* Private */
-static void DrawCell(FluidCell cell, bool drawOutline, bool drawContents);
-static void DrawCellOutline(FluidCell cell);
-static void DrawCellContents(FluidCell cell);
+static void DrawCell(FluidCell cell, bool drawContents, bool drawOutline, bool drawVectors);
