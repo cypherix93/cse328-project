@@ -1,6 +1,6 @@
 #pragma once
 #include <iostream>
-#include "../../Core/WindowManager/WindowManager.h"
+#include "../../Core/Window/WindowManager/WindowManager.h"
 #include "EventHandlers.h"
 
 using namespace std;
