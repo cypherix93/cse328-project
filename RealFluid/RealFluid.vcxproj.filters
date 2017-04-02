@@ -39,6 +39,9 @@
     <ClCompile Include="src\App\Drawing\GridDrawer\GridDrawer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Core\Physics\NavierStokesSolver\NavierStokesSolver.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Core\StateManager\StateManager.h">
@@ -60,6 +63,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\App\Drawing\GridDrawer\GridDrawer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\Physics\NavierStokesSolver\NavierStokesSolver.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
