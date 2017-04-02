@@ -6,6 +6,8 @@ void ProcessGrid(Grid grid)
 {
     float D, B, dp;
 
+    auto needsReprocessing = false;
+
     for each (auto cell in grid.Cells)
     {
         D = ComputeDivergence(cell);
@@ -18,7 +20,13 @@ void ProcessGrid(Grid grid)
         cell.W += (dt / cell.Depth) * dp;
 
         cell.Pressure += dp;
+
+        if (abs(D) > MIN_DIVERGENCE)
+            needsReprocessing = true;
     }
+
+    if (needsReprocessing)
+        ProcessGrid(grid);
 }
 
 float ComputeDivergence(FluidCell cell)
