@@ -6,7 +6,7 @@
 
 
 /* Public */
-void ProcessGrid(Grid grid);
+void ProcessGrid(Grid* grid);
 
 /* Private */
 static float ComputeDivergence(FluidCell cell);

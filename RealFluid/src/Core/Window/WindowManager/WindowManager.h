@@ -19,7 +19,7 @@ class WindowManager
 
     // Lifecycle functions
     void OpenWindow(std::string title, int width, int height);
-    void Start(int fps = 60);
+    void Start(int fps = 30);
 
     // Event Handler Register functions
     void OnInit(InitHandlerFunc);

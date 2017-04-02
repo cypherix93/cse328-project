@@ -25,7 +25,7 @@ void Grid::ConstructGrid()
             cell.Y = CellDimensions * j;
             cell.Z = 0;
 
-            cell.Width = cell.Height = CellDimensions;
+            cell.Width = cell.Height = cell.Depth = CellDimensions;
 
             if (j < 2)
                 cell.Type = Solid;

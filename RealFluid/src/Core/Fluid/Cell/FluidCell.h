@@ -24,7 +24,7 @@ class FluidCell
     int X, Y, Z;
     int Width, Height, Depth;
 
-    float U, V, W;
+    int U, V, W;
     float Pressure;
 
     // Getters

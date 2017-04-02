@@ -11,9 +11,9 @@ FluidCell::FluidCell()
     Depth = 0;
 
     Pressure = 0.0;
-    U = 0.0;
-    V = 0.0;
-    W = 0.0;
+    U = 40;
+    V = 20;
+    W = 0;
 
     Type = Empty;
 }
@@ -90,7 +90,7 @@ void FluidCell::DrawVectors() const
 {
     auto x = X + (Width / 2);
     auto y = Y + (Height / 2);
-    auto z = Z + (Depth / 2);
+    auto z = 0;
 
     glColor4f(1.0f, 0.0f, 0.0f, 1.0f);
 
@@ -105,3 +105,4 @@ void FluidCell::DrawVectors() const
 
     glEnd();
 }
+

@@ -1,4 +1,5 @@
 ﻿#include "EventHandlers.h"
+#include <Core/Physics/NavierStokesSolver/NavierStokesSolver.h>
 
 /* Event Handlers*/
 void InitHandler()
@@ -23,6 +24,8 @@ void InitHandler()
 
 void DrawHandler()
 {
+    ProcessGrid(CELL_GRID);
+
     glClearColor(0.0f, 0.10f, 0.20f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -37,7 +40,7 @@ void DrawHandler()
 
     GridDrawOptions options;
 //    options.DrawCellOutline = false;
-    DrawCellGrid(*CELL_GRID, &options);
+    DrawCellGrid(CELL_GRID, &options);
 }
 
 // Called when a keyboard key is pressed

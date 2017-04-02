@@ -1,14 +1,14 @@
 #include "NavierStokesSolver.h"
 
-float dt = 1.0;
+float dt = 10.0;
 
-void ProcessGrid(Grid grid)
+void ProcessGrid(Grid* grid)
 {
     float D, B, dp;
 
     auto needsReprocessing = false;
 
-    for each (auto cell in grid.Cells)
+    for (auto &cell : grid->Cells)
     {
         D = ComputeDivergence(cell);
         B = ComputeBeta(cell);
@@ -24,9 +24,9 @@ void ProcessGrid(Grid grid)
         if (abs(D) > MIN_DIVERGENCE)
             needsReprocessing = true;
     }
-
-    if (needsReprocessing)
-        ProcessGrid(grid);
+//
+//    if (needsReprocessing)
+//        ProcessGrid(grid);
 }
 
 float ComputeDivergence(FluidCell cell)

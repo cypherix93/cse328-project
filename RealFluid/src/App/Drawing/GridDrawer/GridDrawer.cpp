@@ -11,25 +11,25 @@ GridDrawOptions::~GridDrawOptions()
 {
 }
 
-void DrawCellGrid(Grid grid, GridDrawOptions* options)
+void DrawCellGrid(Grid* grid, GridDrawOptions* options)
 {
     if (options == nullptr)
         options = new GridDrawOptions();
 
-    for each (auto cell in grid.Cells)
+    for (auto cell : grid->Cells)
     {
-        DrawCell(cell, options->DrawCellContents, options->DrawCellOutline, options->DrawCellVectors);
+        DrawCell(cell, *options);
     }
 }
 
-void DrawCell(FluidCell cell, bool drawContents, bool drawOutline, bool drawVectors)
+void DrawCell(FluidCell cell, GridDrawOptions options)
 {
-    if (drawContents)
+    if (options.DrawCellContents)
         cell.DrawContents();
 
-    if (drawOutline)
+    if (options.DrawCellOutline)
         cell.DrawOutline();
 
-    if (drawVectors)
+    if (options.DrawCellVectors)
         cell.DrawVectors();
 }

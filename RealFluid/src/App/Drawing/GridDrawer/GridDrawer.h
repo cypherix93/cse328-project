@@ -17,7 +17,7 @@ class GridDrawOptions
 
 
 /* Public */
-void DrawCellGrid(Grid grid, GridDrawOptions* options = nullptr);
+void DrawCellGrid(Grid* grid, GridDrawOptions* options = nullptr);
 
 /* Private */
-static void DrawCell(FluidCell cell, bool drawContents, bool drawOutline, bool drawVectors);
+static void DrawCell(FluidCell cell, GridDrawOptions options);
