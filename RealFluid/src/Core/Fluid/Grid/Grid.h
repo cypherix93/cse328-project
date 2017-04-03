@@ -27,9 +27,9 @@ class Grid
     float get_v_avg(int i, int j, int k) { return 0.5*(get_v_plus(i, j - 1, k) + get_v_plus(i, j, k)); }
     float get_w_avg(int i, int j, int k) { return 0.5*(get_w_plus(i, j, k - 1) + get_w_plus(i, j, k)); }
 
-    float get_u_plus(int i, int j, int k) { if (u_boundary(i)) return 0; return GetCellAtIndex(i, j, k)->U; }
-    float get_v_plus(int i, int j, int k) { if (v_boundary(j)) return 0; return GetCellAtIndex(i, j, k)->V; }
-    float get_w_plus(int i, int j, int k) { if (w_boundary(k)) return 0; return GetCellAtIndex(i, j, k)->W; }
+    float get_u_plus(int i, int j, int k) { if (u_boundary(i, j, k)) return 0; return GetCellAtIndex(i, j, k)->U; }
+    float get_v_plus(int i, int j, int k) { if (v_boundary(i, j, k)) return 0; return GetCellAtIndex(i, j, k)->V; }
+    float get_w_plus(int i, int j, int k) { if (w_boundary(i, j, k)) return 0; return GetCellAtIndex(i, j, k)->W; }
 
     float get_uv_plus(int i, int j, int k) {
         return 0.5*(get_u_plus(i, j, k) + get_u_plus(i, j + 1, k)) * 0.5*(get_v_plus(i, j, k) + get_v_plus(i + 1, j, k));
@@ -41,11 +41,11 @@ class Grid
         return 0.5*(get_v_plus(i, j, k) + get_v_plus(i, j, k + 1)) * 0.5*(get_w_plus(i, j, k) + get_w_plus(i, j + 1, k));
     }
 
-    bool u_boundary(int i) { if (i >= 0 && i < CellsY - 1) return false; return true; }
-    bool v_boundary(int j) { if (j >= 0 && j < CellsY - 1) return false; return true; }
-    bool w_boundary(int k) { if (k >= 0 && k < CellsZ - 1) return false; return true; }
+    bool u_boundary(int i, int j, int k) { if (i >= 0 && i < CellsY - 1 && j >= 0 && j < CellsY && k >= 0 && k < CellsZ) return false; return true; }
+    bool v_boundary(int i, int j, int k) { if (i >= 0 && i < CellsY && j >= 0 && j < CellsY - 1 && k >= 0 && k < CellsZ) return false; return true; }
+    bool w_boundary(int i, int j, int k) { if (i >= 0 && i < CellsY && j >= 0 && j < CellsY && k >= 0 && k < CellsZ - 1) return false; return true; }
 
-    float getPressure(int i, int j, int k) { return GetCellAtIndex(i, j, k)->Pressure; }
+    float getPressure(int i, int j, int k) { if (u_boundary(i, j, k)) return 0; return GetCellAtIndex(i, j, k)->Pressure; }
 
 
     private:
