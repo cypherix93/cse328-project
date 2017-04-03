@@ -22,7 +22,7 @@ FluidCell::~FluidCell()
 {
 }
 
-vector<int> FluidCell::GetPosition() const
+vector<int> FluidCell::GetPositionVector() const
 {
     return{ X, Y, Z };
 }

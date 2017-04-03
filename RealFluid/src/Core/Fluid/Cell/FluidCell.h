@@ -28,7 +28,7 @@ class FluidCell
     float Pressure;
 
     // Getters
-    vector<int> GetPosition() const;
+    vector<int> GetPositionVector() const;
 
     // Drawers
     void DrawContents() const;

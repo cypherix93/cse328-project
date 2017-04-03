@@ -8,8 +8,12 @@ void ProcessGrid(Grid* grid)
 
     auto needsReprocessing = false;
 
-    for (auto &cell : grid->Cells)
+    auto cells = grid->GetCells();
+    
+    for (auto &pair : *cells)
     {
+        auto cell = pair.second;
+
         D = ComputeDivergence(cell);
         B = ComputeBeta(cell);
 
