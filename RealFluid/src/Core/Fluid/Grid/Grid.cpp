@@ -18,12 +18,13 @@ map<string, FluidCell>* Grid::GetCells()
 
 void Grid::ConstructGrid()
 {
-    auto xDiv = Width / CellDimensions;
-    auto yDiv = Height / CellDimensions;
+    CellsX = Width / CellDimensions;
+    CellsY = Height / CellDimensions;
+    CellsZ = 0;
 
-    for (auto i = 0; i < xDiv; i++)
+    for (auto i = 0; i < CellsX; i++)
     {
-        for (auto j = 0; j < yDiv; j++)
+        for (auto j = 0; j < CellsY; j++)
         {
             FluidCell cell;
             cell.X = CellDimensions * i;
@@ -40,11 +41,11 @@ void Grid::ConstructGrid()
     }
 }
 
-FluidCell* Grid::GetCellAtIndex(int x, int y, int z)
+FluidCell* Grid::GetCellAtIndex(int i, int j, int k)
 {
-    auto px = x * CellDimensions;
-    auto py = y * CellDimensions;
-    auto pz = z * CellDimensions;
+    auto px = i * CellDimensions;
+    auto py = j * CellDimensions;
+    auto pz = k * CellDimensions;
 
     return &Cells[GetCellKey(px, py, pz)];
 }
@@ -56,4 +57,13 @@ FluidCell* Grid::GetCellAtPixel(int x, int y, int z)
     auto cz = z / CellDimensions;
 
     return GetCellAtIndex(cx, cy, cz);
+}
+
+vector<int> Grid::GetCellIndex(FluidCell* cell)
+{
+    auto cx = cell->X / CellDimensions;
+    auto cy = cell->Y / CellDimensions;
+    auto cz = cell->Z / CellDimensions;
+
+    return{ cx, cy, cz };
 }

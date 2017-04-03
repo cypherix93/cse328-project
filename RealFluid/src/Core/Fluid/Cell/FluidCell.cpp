@@ -11,9 +11,9 @@ FluidCell::FluidCell()
     Depth = 0;
 
     Pressure = 0.0;
-    U = 40;
-    V = 20;
-    W = 0;
+    U = 40.0;
+    V = 20.0;
+    W = 0.0;
 
     Type = Empty;
 }

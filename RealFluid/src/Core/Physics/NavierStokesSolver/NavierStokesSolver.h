@@ -9,6 +9,7 @@
 void ProcessGrid(Grid* grid);
 
 /* Private */
+static void ComputeNewVelocities(Grid* grid);
 static void AdjustForIncompressibility(Grid* grid);
 
 static float ComputeDivergence(FluidCell* cell);

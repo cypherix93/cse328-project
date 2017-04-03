@@ -13,7 +13,7 @@ class Application
     public:
     Application();
     virtual ~Application();
-
+    
     // Lifecycle Hooks
     void Setup();
     void Start();
