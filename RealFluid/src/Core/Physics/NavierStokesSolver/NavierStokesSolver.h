@@ -9,6 +9,8 @@
 void ProcessGrid(Grid* grid);
 
 /* Private */
-static float ComputeDivergence(FluidCell cell);
-static float ComputeBeta(FluidCell cell);
+static void AdjustForIncompressibility(Grid* grid);
+
+static float ComputeDivergence(FluidCell* cell);
+static float ComputeBeta(FluidCell* cell);
 static float ComputeDeltaPressure(float beta, float divergence);

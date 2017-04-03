@@ -28,12 +28,12 @@ void DrawCellGrid(Grid* grid, GridDrawOptions* options)
 
 void DrawCell(FluidCell cell, GridDrawOptions options)
 {
-    if (options.DrawCellContents)
-        cell.DrawContents();
+    if (options.DrawCellVectors)
+        cell.DrawVectors();
 
     if (options.DrawCellOutline)
         cell.DrawOutline();
 
-    if (options.DrawCellVectors)
-        cell.DrawVectors();
+    if (options.DrawCellContents)
+        cell.DrawContents();
 }
