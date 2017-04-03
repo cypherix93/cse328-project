@@ -20,20 +20,20 @@ void DrawCellGrid(Grid* grid, GridDrawOptions* options)
 
     for (auto &pair : *cells)
     {
-        auto cell = pair.second;
+        auto cell = &(pair.second);
 
-        DrawCell(cell, *options);
+        DrawCell(cell, options);
     }
 }
 
-void DrawCell(FluidCell cell, GridDrawOptions options)
+void DrawCell(FluidCell* cell, GridDrawOptions* options)
 {
-    if (options.DrawCellVectors)
-        cell.DrawVectors();
+    if (options->DrawCellVectors)
+        cell->DrawVectors();
 
-    if (options.DrawCellOutline)
-        cell.DrawOutline();
+    if (options->DrawCellOutline)
+        cell->DrawOutline();
 
-    if (options.DrawCellContents)
-        cell.DrawContents();
+    if (options->DrawCellContents)
+        cell->DrawContents();
 }

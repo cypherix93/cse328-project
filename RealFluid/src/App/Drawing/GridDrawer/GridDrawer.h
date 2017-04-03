@@ -20,4 +20,4 @@ class GridDrawOptions
 void DrawCellGrid(Grid* grid, GridDrawOptions* options = nullptr);
 
 /* Private */
-static void DrawCell(FluidCell cell, GridDrawOptions options);
+static void DrawCell(FluidCell* cell, GridDrawOptions* options);
