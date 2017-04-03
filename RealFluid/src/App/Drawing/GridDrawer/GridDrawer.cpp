@@ -16,12 +16,10 @@ void DrawCellGrid(Grid* grid, GridDrawOptions* options)
     if (options == nullptr)
         options = new GridDrawOptions();
 
-    auto cells = grid->GetCells();
+    auto cells = grid->GetCellsVector();
 
-    for (auto &pair : *cells)
+    for (auto &cell : *cells)
     {
-        auto cell = &(pair.second);
-
         DrawCell(cell, options);
     }
 }

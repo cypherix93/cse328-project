@@ -13,9 +13,8 @@ class Grid
     virtual ~Grid();
 
     // Grid Operations
-    map<string, FluidCell>* GetCells();
-
-    void ConstructGrid();
+    map<string, FluidCell*>* GetCellsMap();
+    vector<FluidCell*>* GetCellsVector();
 
     // Cell Operations
     FluidCell* GetCellAtIndex(int i, int j, int k);
@@ -50,10 +49,14 @@ class Grid
 
 
     private:
-    map<string, FluidCell> Cells;
+    map<string, FluidCell*> CellsMap;
+    vector<FluidCell*> CellsVector;
 
     int Width, Height;
     int CellsX, CellsY, CellsZ;
     int CellDimensions;
+
+    void ConstructGrid();
+    void DestructGrid();
 };
 

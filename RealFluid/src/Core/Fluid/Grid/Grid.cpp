@@ -5,15 +5,23 @@ Grid::Grid(int width, int height, int cellDimensions)
     Width = width;
     Height = height;
     CellDimensions = cellDimensions;
+
+    ConstructGrid();
 }
 
 Grid::~Grid()
 {
+    DestructGrid();
 }
 
-map<string, FluidCell>* Grid::GetCells()
+map<string, FluidCell*>* Grid::GetCellsMap()
 {
-    return &Cells;
+    return &CellsMap;
+}
+
+vector<FluidCell*>* Grid::GetCellsVector()
+{
+    return &CellsVector;
 }
 
 void Grid::ConstructGrid()
@@ -26,28 +34,42 @@ void Grid::ConstructGrid()
     {
         for (auto j = 0; j < CellsY; j++)
         {
-            FluidCell cell;
-            cell.X = CellDimensions * i;
-            cell.Y = CellDimensions * j;
-            cell.Z = 0;
+            auto cell = new FluidCell();
+            cell->X = CellDimensions * i;
+            cell->Y = CellDimensions * j;
+            cell->Z = 0;
 
-            cell.Width = cell.Height = cell.Depth = CellDimensions;
+            cell->Width = cell->Height = cell->Depth = CellDimensions;
 
             if (j < 2)
-                cell.Type = Solid;
+                cell->Type = Solid;
 
-            Cells[GetCellKey(cell.X, cell.Y, cell.Z)] = cell;
+            CellsVector.push_back(cell);
         }
+    }
+
+    for (auto cell : CellsVector)
+    {
+        CellsMap[GetCellKey(cell->X, cell->Y, cell->Z)] = cell;
     }
 }
 
+void Grid::DestructGrid()
+{
+    for (auto cell : CellsVector)
+    {
+        free(cell);
+    }
+}
+
+/* Cell Operations */
 FluidCell* Grid::GetCellAtIndex(int i, int j, int k)
 {
     auto px = i * CellDimensions;
     auto py = j * CellDimensions;
     auto pz = k * CellDimensions;
 
-    return &Cells[GetCellKey(px, py, pz)];
+    return CellsMap[GetCellKey(px, py, pz)];
 }
 
 FluidCell* Grid::GetCellAtPixel(int x, int y, int z)

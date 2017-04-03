@@ -19,7 +19,6 @@ void InitHandler()
     gluOrtho2D(0, WINDOW_WIDTH, 0, WINDOW_HEIGHT);
 
     CELL_GRID = new Grid{ WINDOW_WIDTH, WINDOW_HEIGHT, 40 };
-    CELL_GRID->ConstructGrid();
 }
 
 void DrawHandler()

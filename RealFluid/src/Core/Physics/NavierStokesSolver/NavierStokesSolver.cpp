@@ -7,22 +7,18 @@ vector<float> gravity = { 0.0f, -9.8f, 0.0f };
 /* Public */
 void ProcessGrid(Grid* grid)
 {
-    ComputeNewVelocities(grid);
+    //    ComputeNewVelocities(grid);
 }
 
 void ComputeNewVelocities(Grid* grid)
 {
-    auto cells = grid->GetCells();
-
-    FluidCell* cell;
-
     int dx, dy, dz;
     int dx2, dy2, dz2;
 
-    for (auto &pair : *cells)
-    {
-        cell = &(pair.second);
+    auto cells = grid->GetCellsVector();
 
+    for (auto &cell : *cells)
+    {
         int i, j, k;
         auto index = grid->GetCellIndex(cell);
         i = index[0];
@@ -85,12 +81,10 @@ void AdjustForIncompressibility(Grid* grid)
 
     auto needsReprocessing = false;
 
-    auto cells = grid->GetCells();
+    auto cells = grid->GetCellsVector();
 
-    for (auto &pair : *cells)
+    for (auto &cell : *cells)
     {
-        auto cell = &(pair.second);
-
         D = ComputeDivergence(cell);
         B = ComputeBeta(cell);
 
