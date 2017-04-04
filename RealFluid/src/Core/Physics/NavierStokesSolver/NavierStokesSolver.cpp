@@ -240,7 +240,9 @@ void MoveParticles(Grid* grid)
     {
         auto particle = particles[p];
 
+        auto cell = grid->GetCellAtPixel(particle->X, particle->Y, particle->Z);
 
+        particle->MoveBy(cell->U, cell->V, cell->W);
     }
 }
 

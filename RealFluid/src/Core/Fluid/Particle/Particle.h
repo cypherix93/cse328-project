@@ -7,5 +7,7 @@ class Particle
     virtual ~Particle();
 
     int X, Y, Z;
+
+    void MoveBy(float u, float v, float w);
 };
 

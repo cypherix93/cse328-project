@@ -11,3 +11,10 @@ Particle::Particle(int x, int y, int z)
 Particle::~Particle()
 {
 }
+
+void Particle::MoveBy(float u, float v, float w)
+{
+    X += u;
+    Y += v;
+    Z += w;
+}
