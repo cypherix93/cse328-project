@@ -7,8 +7,27 @@ vector<float> gravity = { 0.0f, -9.8f, 0.0f };
 /* Public */
 void ProcessGrid(Grid* grid)
 {
-    ComputeNewVelocities(grid);
+
+    UpdateNewVelocities(grid);
     AdjustForIncompressibility(grid);
+}
+
+void UpdateNewVelocities(Grid* grid)
+{
+    ComputeNewVelocities(grid);
+
+    #pragma omp parallel for
+    for (auto c = 0; c < UpdatedCellVectorBuffer.size(); c++)
+    {
+        auto update = UpdatedCellVectorBuffer[c];
+
+        auto cell = grid->GetCellAtIndex(update.I, update.J, update.K);
+        cell->U = update.U;
+        cell->V = update.V;
+        cell->W = update.W;
+    }
+
+    UpdatedCellVectorBuffer.clear();
 }
 
 void ComputeNewVelocities(Grid* grid)
@@ -90,27 +109,14 @@ void ComputeNewVelocities(Grid* grid)
 
         UpdatedCellVectorBuffer.push_back(newVector);
     }
-
-    UpdateNewVelocities(grid);
-}
-
-void UpdateNewVelocities(Grid* grid)
-{
-    #pragma omp parallel for
-    for (auto c = 0; c < UpdatedCellVectorBuffer.size(); c++)
-    {
-        auto update = UpdatedCellVectorBuffer[c];
-
-        auto cell = grid->GetCellAtIndex(update.I, update.J, update.K);
-        cell->U = update.U;
-        cell->V = update.V;
-        cell->W = update.W;
-    }
-
-    UpdatedCellVectorBuffer.clear();
 }
 
 /* Private */
+void AdjustBoundaryConditios(Grid* grid)
+{
+
+}
+
 void AdjustForIncompressibility(Grid* grid)
 {
     float D, B, dp;
@@ -118,14 +124,17 @@ void AdjustForIncompressibility(Grid* grid)
     auto iters = 0;
     auto needsReprocessing = false;
 
-    auto cells = grid->GetCellsVector();
+    auto cells = *(grid->GetCellsVector());
 
     do
     {
         iters++;
 
-        for (auto &cell : *cells)
+        #pragma omp parallel for
+        for (auto c = 0; c < cells.size(); c++)
         {
+            auto cell = cells[c];
+
             D = ComputeDivergence(cell);
             B = ComputeBeta(cell);
 
@@ -137,7 +146,7 @@ void AdjustForIncompressibility(Grid* grid)
 
             cell->Pressure += dp;
 
-            needsReprocessing = (iters < 6) && (abs(D) > EPSILON);
+            needsReprocessing = (iters < 3) && (abs(D) > EPSILON);
         }
     } while (needsReprocessing);
 }
