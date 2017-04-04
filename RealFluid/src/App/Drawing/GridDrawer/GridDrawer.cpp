@@ -5,6 +5,7 @@ GridDrawOptions::GridDrawOptions()
     DrawCellContents = true;
     DrawCellOutline = true;
     DrawCellVectors = true;
+    DrawParticles = true;
 }
 
 GridDrawOptions::~GridDrawOptions()
@@ -22,6 +23,16 @@ void DrawCellGrid(Grid* grid, GridDrawOptions* options)
     {
         DrawCell(cell, options);
     }
+
+    if (options->DrawParticles)
+    {
+        auto particles = grid->GetParticlesVector();
+
+        for (auto &particle : *particles)
+        {
+            DrawParticle(particle);
+        }
+    }
 }
 
 void DrawCell(FluidCell* cell, GridDrawOptions* options)
@@ -34,4 +45,16 @@ void DrawCell(FluidCell* cell, GridDrawOptions* options)
 
     if (options->DrawCellContents)
         cell->DrawContents();
+}
+
+void DrawParticle(Particle* particle)
+{
+    glPointSize(6.0);
+    glColor4f(0.57f, 0.63f, 0.9f, 1.0f);
+
+    glBegin(GL_POINTS);
+
+    glVertex3i(particle->X, particle->Y, particle->Z);
+
+    glEnd();
 }

@@ -13,6 +13,7 @@ class GridDrawOptions
     bool DrawCellOutline;
     bool DrawCellContents;
     bool DrawCellVectors;
+    bool DrawParticles;
 };
 
 
@@ -21,3 +22,4 @@ void DrawCellGrid(Grid* grid, GridDrawOptions* options = nullptr);
 
 /* Private */
 static void DrawCell(FluidCell* cell, GridDrawOptions* options);
+static void DrawParticle(Particle* particle);

@@ -40,25 +40,33 @@ void FluidCell::DrawContents() const
     if (Type == Solid)
     {
         glColor4f(0.8f, 0.63f, 0.44f, 1.0f);
-
-        glBegin(GL_POLYGON);
-
-        glVertex3i(x, y, z);
-
-        x += Width;
-        glVertex3i(x, y, z);
-
-        y += Height;
-        glVertex3i(x, y, z);
-
-        x -= Width;
-        glVertex3i(x, y, z);
-
-        y -= Height;
-        glVertex3i(x, y, z);
-
-        glEnd();
     }
+    else if(Type == Surface)
+    {
+        glColor4f(0.75f, 0.85f, 0.95f, 1.0f);
+    }
+    else if (Type == Full)
+    {
+        glColor4f(0.45f, 0.75f, 0.95f, 1.0f);
+    }
+
+    glBegin(GL_POLYGON);
+
+    glVertex3i(x, y, z);
+
+    x += Width;
+    glVertex3i(x, y, z);
+
+    y += Height;
+    glVertex3i(x, y, z);
+
+    x -= Width;
+    glVertex3i(x, y, z);
+
+    y -= Height;
+    glVertex3i(x, y, z);
+
+    glEnd();
 }
 
 void FluidCell::DrawOutline() const

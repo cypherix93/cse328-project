@@ -12,10 +12,9 @@ void ProcessGrid(Grid* grid)
     UpdateCellsWithParticles(grid);
     MoveParticles(grid);
 
-    UpdateNewVelocities(grid);
-
-    AdjustForIncompressibility(grid);
     AdjustBoundaryConditions(grid);
+    UpdateNewVelocities(grid);
+    AdjustForIncompressibility(grid);
 }
 
 void UpdateNewVelocities(Grid* grid)
@@ -47,6 +46,9 @@ void ComputeNewVelocities(Grid* grid)
     for (auto c = 0; c < cells.size(); c++)
     {
         auto cell = cells[c];
+
+        if (cell->Boundary == Inflow)
+            continue;
 
         int i, j, k;
         auto index = grid->GetCellIndex(cell->X, cell->Y, cell->Z);
@@ -195,7 +197,8 @@ void UpdateCellsWithParticles(Grid* grid)
 
         auto cell = grid->GetCellAtPixel(particle->X, particle->Y, particle->Z);
 
-        cell->Type = Full;
+        if (cell != nullptr && cell->Type != Solid)
+            cell->Type = Full;
     }
 
     // Now compute which cells are surface
@@ -207,6 +210,9 @@ void UpdateCellsWithParticles(Grid* grid)
     for (auto c = 0; c < cells.size(); c++)
     {
         auto cell = cells[c];
+
+        if (cell->Type == Solid)
+            continue;
 
         auto index = grid->GetCellIndex(cell->X, cell->Y, cell->Z);
         i = index[0];
@@ -222,7 +228,7 @@ void UpdateCellsWithParticles(Grid* grid)
 
         for (auto neighbor : neighbors)
         {
-            if (neighbor->Type == Empty)
+            if (neighbor != nullptr && neighbor->Type == Empty)
             {
                 cell->Type = Surface;
                 break;

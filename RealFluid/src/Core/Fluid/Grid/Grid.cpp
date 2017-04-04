@@ -54,7 +54,7 @@ void Grid::ConstructGrid()
             if (cell->Type != Solid && i < 1)
             {
                 cell->Boundary = Inflow;
-                cell->U = 20.0;
+                cell->U = 60.0;
             }
 
             CellsVector.push_back(cell);
