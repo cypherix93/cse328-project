@@ -1,6 +1,6 @@
 #include "NavierStokesSolver.h"
 
-auto dt = 1.0;
+auto dt = 1.0 / 60.0;
 auto viscosity = 10.0;
 vector<float> gravity = { 0.0f, -9.8f, 0.0f };
 
@@ -8,7 +8,7 @@ vector<float> gravity = { 0.0f, -9.8f, 0.0f };
 void ProcessGrid(Grid* grid)
 {
     ComputeNewVelocities(grid);
-    AdjustForIncompressibility(grid);
+//    AdjustForIncompressibility(grid);
 }
 
 void ComputeNewVelocities(Grid* grid)
