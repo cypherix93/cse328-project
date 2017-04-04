@@ -1,7 +1,7 @@
 #include "NavierStokesSolver.h"
 
-auto dt = 1.0 / 10.0;
-auto viscosity = 10.0;
+auto dt = 1.0;
+auto viscosity = 0.0001;
 vector<float> gravity = { 0.0f, -9.8f, 0.0f };
 
 auto particlesAdded = 0;
@@ -15,11 +15,12 @@ void ProcessGrid(Grid* grid)
         AddParticles(grid);
     }
     UpdateCellsWithParticles(grid);
-    MoveParticles(grid);
 
     AdjustBoundaryConditions(grid);
     UpdateNewVelocities(grid);
     AdjustForIncompressibility(grid);
+
+    MoveParticles(grid);
 }
 
 void UpdateNewVelocities(Grid* grid)
@@ -258,7 +259,8 @@ void MoveParticles(Grid* grid)
 
         auto cell = grid->GetCellAtPixel(particle->X, particle->Y, particle->Z);
 
-        particle->MoveBy(cell->U, cell->V, cell->W);
+        if (cell != nullptr)
+            particle->MoveBy(cell->U * dt, cell->V * dt, cell->W * dt);
     }
 }
 

@@ -108,8 +108,8 @@ vector<int> Grid::GetCellIndex(int x, int y, int z)
 void Grid::AddParticle(FluidCell* cell)
 {
     int x, y, z;
-    x = cell->X;
-    y = cell->Y;
+    x = cell->X + (CellDimensions / 2);
+    y = cell->Y + (CellDimensions / 2);
     z = cell->Z;
 
     ParticlesVector.push_back(new Particle(x, y, z));
