@@ -25,7 +25,7 @@ static vector<UpdatedCellVector> UpdatedCellVectorBuffer;
 static void UpdateNewVelocities(Grid* grid);
 static void ComputeNewVelocities(Grid* grid);
 
-static void AdjustBoundaryConditios(Grid* grid);
+static void AdjustBoundaryConditions(Grid* grid);
 static void AdjustForIncompressibility(Grid* grid);
 
 static float ComputeDivergence(FluidCell* cell);

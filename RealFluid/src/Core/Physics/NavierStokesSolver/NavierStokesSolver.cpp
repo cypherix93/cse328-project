@@ -7,7 +7,7 @@ vector<float> gravity = { 0.0f, -9.8f, 0.0f };
 /* Public */
 void ProcessGrid(Grid* grid)
 {
-
+    AdjustBoundaryConditions(grid);
     UpdateNewVelocities(grid);
     AdjustForIncompressibility(grid);
 }
@@ -112,9 +112,31 @@ void ComputeNewVelocities(Grid* grid)
 }
 
 /* Private */
-void AdjustBoundaryConditios(Grid* grid)
+void AdjustBoundaryConditions(Grid* grid)
 {
+    auto cells = *(grid->GetCellsVector());
 
+    #pragma omp parallel for
+    for (auto c = 0; c < cells.size(); c++)
+    {
+        auto cell = cells[c];
+
+        if (cell->Type != Solid)
+            continue;
+
+        int i, j, k;
+        auto index = grid->GetCellIndex(cell->X, cell->Y, cell->Z);
+        i = index[0];
+        j = index[1];
+        k = index[2];
+
+        auto cellAbove = grid->GetCellAtIndex(i, j + 1, k);
+        cell->Pressure = cellAbove->Type != Solid ? cellAbove->Pressure : 0.0;
+
+        cell->U = cellAbove->Type != Solid ? -cellAbove->U : 0.0;
+        cell->V = 0.0;
+        cell->W = 0.0;
+    }
 }
 
 void AdjustForIncompressibility(Grid* grid)
