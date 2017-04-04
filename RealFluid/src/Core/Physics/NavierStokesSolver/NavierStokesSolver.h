@@ -1,7 +1,7 @@
 #pragma once
 #include <Core/Fluid/Grid/Grid.h>
 
-#define MIN_DIVERGENCE 0.0001
+#define EPSILON 0.1
 #define BETA_0 1.7
 
 

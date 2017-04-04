@@ -1,6 +1,6 @@
 #include "NavierStokesSolver.h"
 
-auto dt = 10.0;
+auto dt = 1.0;
 auto viscosity = 1.0;
 vector<float> gravity = { 0.0f, -9.8f, 0.0f };
 
@@ -8,6 +8,7 @@ vector<float> gravity = { 0.0f, -9.8f, 0.0f };
 void ProcessGrid(Grid* grid)
 {
     ComputeNewVelocities(grid);
+    AdjustForIncompressibility(grid);
 }
 
 void ComputeNewVelocities(Grid* grid)
@@ -56,21 +57,21 @@ void ComputeNewVelocities(Grid* grid)
                 (viscosity / dx2) * (grid->get_v_plus(i + 1, j, k) - 2 * grid->get_v_plus(i, j, k) + grid->get_v_plus(i - 1, j, k)) +
                 (viscosity / dy2) * (grid->get_v_plus(i, j + 1, k) - 2 * grid->get_v_plus(i, j, k) + grid->get_v_plus(i, j - 1, k)) +
                 (viscosity / dz2) * (grid->get_v_plus(i, j, k + 1) - 2 * grid->get_v_plus(i, j, k) + grid->get_v_plus(i, j, k - 1)));
-//
-//        float new_w =
-//            grid->get_w_plus(i, j, k) +
-//            dt * ((1 / dx) * (grid->get_uw_plus(i - 1, j, k) - grid->get_uw_plus(i, j, k)) +
-//            (1 / dy) * (grid->get_vw_plus(i, j - 1, k) - grid->get_vw_plus(i, j, k)) +
-//                (1 / dz) * (pow(grid->get_w_avg(i, j, k), 2) - pow(grid->get_w_avg(i, j, k + 1), 2)) +
-//                gravity[2] +
-//                (1 / dz) * (grid->getPressure(i, j, k) - grid->getPressure(i, j, k + 1)) +
-//                (viscosity / dx2) * (grid->get_w_plus(i + 1, j, k) - 2 * grid->get_w_plus(i, j, k) + grid->get_w_plus(i - 1, j, k)) +
-//                (viscosity / dy2) * (grid->get_w_plus(i, j + 1, k) - 2 * grid->get_w_plus(i, j, k) + grid->get_w_plus(i, j - 1, k)) +
-//                (viscosity / dz2) * (grid->get_w_plus(i, j, k + 1) - 2 * grid->get_w_plus(i, j, k) + grid->get_w_plus(i, j, k - 1)));
+
+        float new_w =
+            grid->get_w_plus(i, j, k) +
+            dt * ((1 / dx) * (grid->get_uw_plus(i - 1, j, k) - grid->get_uw_plus(i, j, k)) +
+            (1 / dy) * (grid->get_vw_plus(i, j - 1, k) - grid->get_vw_plus(i, j, k)) +
+                (1 / dz) * (pow(grid->get_w_avg(i, j, k), 2) - pow(grid->get_w_avg(i, j, k + 1), 2)) +
+                gravity[2] +
+                (1 / dz) * (grid->getPressure(i, j, k) - grid->getPressure(i, j, k + 1)) +
+                (viscosity / dx2) * (grid->get_w_plus(i + 1, j, k) - 2 * grid->get_w_plus(i, j, k) + grid->get_w_plus(i - 1, j, k)) +
+                (viscosity / dy2) * (grid->get_w_plus(i, j + 1, k) - 2 * grid->get_w_plus(i, j, k) + grid->get_w_plus(i, j - 1, k)) +
+                (viscosity / dz2) * (grid->get_w_plus(i, j, k + 1) - 2 * grid->get_w_plus(i, j, k) + grid->get_w_plus(i, j, k - 1)));
 
         cell->U = new_u;
         cell->V = new_v;
-//        cell->W = new_w;
+        cell->W = new_w;
     }
 }
 
@@ -79,29 +80,31 @@ void AdjustForIncompressibility(Grid* grid)
 {
     float D, B, dp;
 
+    auto iters = 0;
     auto needsReprocessing = false;
 
     auto cells = grid->GetCellsVector();
 
-    for (auto &cell : *cells)
+    do
     {
-        D = ComputeDivergence(cell);
-        B = ComputeBeta(cell);
+        iters++;
 
-        dp = ComputeDeltaPressure(B, D);
+        for (auto &cell : *cells)
+        {
+            D = ComputeDivergence(cell);
+            B = ComputeBeta(cell);
 
-        cell->U += (dt / cell->Width) * dp;
-        cell->V += (dt / cell->Height) * dp;
-        cell->W += (dt / cell->Depth) * dp;
+            dp = ComputeDeltaPressure(B, D);
 
-        cell->Pressure += dp;
+            cell->U += (dt / cell->Width) * dp;
+            cell->V += (dt / cell->Height) * dp;
+            cell->W += (dt / cell->Depth) * dp;
 
-        if (abs(D) > MIN_DIVERGENCE)
-            needsReprocessing = true;
-    }
-    //
-    //    if (needsReprocessing)
-    //        ProcessGrid(grid);
+            cell->Pressure += dp;
+
+            needsReprocessing = (iters < 6) && (abs(D) > EPSILON);
+        }
+    } while (needsReprocessing);
 }
 
 float ComputeDivergence(FluidCell* cell)

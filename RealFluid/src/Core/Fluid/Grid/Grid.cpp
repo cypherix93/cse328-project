@@ -44,6 +44,12 @@ void Grid::ConstructGrid()
             if (j < 2)
                 cell->Type = Solid;
 
+            if (cell->Type != Solid)
+            {
+                cell->U = 40.0;
+                cell->V = 10.0;
+            }
+
             CellsVector.push_back(cell);
         }
     }
