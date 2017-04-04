@@ -13,6 +13,13 @@ enum FluidCellType
     Solid
 };
 
+enum BoundaryType
+{
+    Inflow,
+    Outflow,
+    NotBoundary
+};
+
 class FluidCell
 {
     public:
@@ -20,6 +27,7 @@ class FluidCell
     ~FluidCell();
 
     FluidCellType Type;
+    BoundaryType Boundary;
 
     int X, Y, Z;
     int Width, Height, Depth;

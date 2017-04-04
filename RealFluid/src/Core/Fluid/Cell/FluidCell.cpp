@@ -16,6 +16,7 @@ FluidCell::FluidCell()
     W = 0.0;
 
     Type = Empty;
+    Boundary = NotBoundary;
 }
 
 FluidCell::~FluidCell()

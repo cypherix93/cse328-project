@@ -28,6 +28,8 @@ static void ComputeNewVelocities(Grid* grid);
 static void AdjustBoundaryConditions(Grid* grid);
 static void AdjustForIncompressibility(Grid* grid);
 
+static void AddParticles(Grid* grid);
+static void UpdateCellsWithParticles(Grid* grid);
 static void MoveParticles(Grid* grid);
 
 static float ComputeDivergence(FluidCell* cell);

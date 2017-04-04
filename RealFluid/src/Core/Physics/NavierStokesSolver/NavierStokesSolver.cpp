@@ -4,12 +4,18 @@ auto dt = 1.0 / 10.0;
 auto viscosity = 10.0;
 vector<float> gravity = { 0.0f, -9.8f, 0.0f };
 
+
 /* Public */
 void ProcessGrid(Grid* grid)
 {
-    AdjustBoundaryConditions(grid);
+    AddParticles(grid);
+    UpdateCellsWithParticles(grid);
+    MoveParticles(grid);
+
     UpdateNewVelocities(grid);
+
     AdjustForIncompressibility(grid);
+    AdjustBoundaryConditions(grid);
 }
 
 void UpdateNewVelocities(Grid* grid)
@@ -159,6 +165,70 @@ void AdjustForIncompressibility(Grid* grid)
             needsReprocessing = (iters < 3) && (abs(D) > EPSILON);
         }
     } while (needsReprocessing);
+}
+
+void AddParticles(Grid* grid)
+{
+    auto cells = *(grid->GetCellsVector());
+
+    #pragma omp parallel for
+    for (auto c = 0; c < cells.size(); c++)
+    {
+        auto cell = cells[c];
+
+        if (cell->Boundary == Inflow)
+        {
+            grid->AddParticle(cell);
+        }
+    }
+}
+
+void UpdateCellsWithParticles(Grid* grid)
+{
+    auto particles = *(grid->GetParticlesVector());
+
+    // First set all cells with particles to full
+    #pragma omp parallel for
+    for (auto p = 0; p < particles.size(); p++)
+    {
+        auto particle = particles[p];
+
+        auto cell = grid->GetCellAtPixel(particle->X, particle->Y, particle->Z);
+
+        cell->Type = Full;
+    }
+
+    // Now compute which cells are surface
+    auto cells = *(grid->GetCellsVector());
+
+    int i, j, k;
+
+    #pragma omp parallel for
+    for (auto c = 0; c < cells.size(); c++)
+    {
+        auto cell = cells[c];
+
+        auto index = grid->GetCellIndex(cell->X, cell->Y, cell->Z);
+        i = index[0];
+        j = index[1];
+        k = index[2];
+
+        auto neighbors = {
+            grid->GetCellAtIndex(i, j + 1, k),
+            grid->GetCellAtIndex(i + 1, j, k),
+            grid->GetCellAtIndex(i, j - 1, k),
+            grid->GetCellAtIndex(i - 1, j, k),
+        };
+
+        for (auto neighbor : neighbors)
+        {
+            if (neighbor->Type == Empty)
+            {
+                cell->Type = Surface;
+                break;
+            }
+        }
+    }
 }
 
 void MoveParticles(Grid* grid)

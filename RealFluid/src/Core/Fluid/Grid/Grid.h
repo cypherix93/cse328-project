@@ -24,7 +24,7 @@ class Grid
 
     vector<int> GetCellIndex(int x, int y, int z);
 
-    void AddParticle(int x, int y, int z);
+    void AddParticle(FluidCell* cell);
 
 
     float get_u_plus(int i, int j, int k) { if (u_boundary(i, j, k)) return 0; return GetCellAtIndex(i, j, k)->U; }

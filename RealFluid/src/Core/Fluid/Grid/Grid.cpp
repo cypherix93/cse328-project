@@ -51,10 +51,10 @@ void Grid::ConstructGrid()
                 cell->Type = Solid;
             }
 
-            if (cell->Type != Solid && i < 12 && j < 12)
+            if (cell->Type != Solid && i < 1)
             {
-                cell->U = 40.0;
-                cell->V = 10.0;
+                cell->Boundary = Inflow;
+                cell->U = 20.0;
             }
 
             CellsVector.push_back(cell);
@@ -105,8 +105,12 @@ vector<int> Grid::GetCellIndex(int x, int y, int z)
     return{ i, j, k };
 }
 
-void Grid::AddParticle(int x, int y, int z)
+void Grid::AddParticle(FluidCell* cell)
 {
-    auto particle = new Particle(x, y, z);
-    ParticlesVector.push_back(particle);
+    int x, y, z;
+    x = cell->X;
+    y = cell->Y;
+    z = cell->Z;
+
+    ParticlesVector.push_back(new Particle(x, y, z));
 }
