@@ -1,6 +1,6 @@
 #include "NavierStokesSolver.h"
 
-auto dt = 1.0;
+auto dt = 1.0 / 20.0;
 auto viscosity = 0.0001;
 vector<float> gravity = { 0.0f, -9.8f, 0.0f };
 
@@ -9,10 +9,12 @@ auto particlesAdded = 0;
 /* Public */
 void ProcessGrid(Grid* grid)
 {
-    if (particlesAdded < 10)
+    if (particlesAdded < 40)
     {
         particlesAdded++;
-        AddParticles(grid);
+
+        if (particlesAdded % 4 == 0)
+            AddParticles(grid);
     }
     UpdateCellsWithParticles(grid);
 
