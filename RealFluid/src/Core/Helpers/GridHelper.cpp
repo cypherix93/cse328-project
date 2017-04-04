@@ -1,9 +1,9 @@
 #include "GridHelper.h"
 
-string GetCellKey(int x, int y, int z)
+string GetCellKey(int i, int j, int k)
 {
     stringstream stream;
-    stream << x << "," << y << "," << z;
+    stream << i << "," << j << "," << k;
 
     return stream.str();
 }

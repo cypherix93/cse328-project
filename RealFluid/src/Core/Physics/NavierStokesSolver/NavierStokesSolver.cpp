@@ -20,11 +20,11 @@ void ComputeNewVelocities(Grid* grid)
 
     #pragma omp parallel for
     for (auto it = cells.begin(); it < cells.end(); ++it)
-    {        
+    {
         auto cell = *it;
 
         int i, j, k;
-        auto index = grid->GetCellIndex(cell);
+        auto index = grid->GetCellIndex(cell->X, cell->Y, cell->Z);
         i = index[0];
         j = index[1];
         k = index[2];

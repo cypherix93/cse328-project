@@ -20,7 +20,7 @@ class Grid
     FluidCell* GetCellAtIndex(int i, int j, int k);
     FluidCell* GetCellAtPixel(int x, int y, int z);
 
-    vector<int> GetCellIndex(FluidCell* cell);
+    vector<int> GetCellIndex(int x, int y, int z);
 
 
     float get_u_avg(int i, int j, int k) { return 0.5*(get_u_plus(i - 1, j, k) + get_u_plus(i, j, k)); }

@@ -56,7 +56,8 @@ void Grid::ConstructGrid()
 
     for (auto cell : CellsVector)
     {
-        CellsMap[GetCellKey(cell->X, cell->Y, cell->Z)] = cell;
+        auto index = GetCellIndex(cell->X, cell->Y, cell->Z);
+        CellsMap[GetCellKey(index[0], index[1], index[2])] = cell;
     }
 }
 
@@ -66,32 +67,28 @@ void Grid::DestructGrid()
     {
         free(cell);
     }
+    CellsVector.clear();
+    CellsMap.clear();
 }
 
 /* Cell Operations */
 FluidCell* Grid::GetCellAtIndex(int i, int j, int k)
 {
-    auto px = i * CellDimensions;
-    auto py = j * CellDimensions;
-    auto pz = k * CellDimensions;
-
-    return CellsMap[GetCellKey(px, py, pz)];
+    return CellsMap[GetCellKey(i, j, k)];
 }
 
 FluidCell* Grid::GetCellAtPixel(int x, int y, int z)
 {
-    auto cx = x / CellDimensions;
-    auto cy = y / CellDimensions;
-    auto cz = z / CellDimensions;
+    auto index = GetCellIndex(x, y, z);
 
-    return GetCellAtIndex(cx, cy, cz);
+    return GetCellAtIndex(index[0], index[1], index[2]);
 }
 
-vector<int> Grid::GetCellIndex(FluidCell* cell)
+vector<int> Grid::GetCellIndex(int x, int y, int z)
 {
-    auto cx = cell->X / CellDimensions;
-    auto cy = cell->Y / CellDimensions;
-    auto cz = cell->Z / CellDimensions;
+    auto i = x / CellDimensions;
+    auto j = y / CellDimensions;
+    auto k = z / CellDimensions;
 
-    return{ cx, cy, cz };
+    return{ i, j, k };
 }
