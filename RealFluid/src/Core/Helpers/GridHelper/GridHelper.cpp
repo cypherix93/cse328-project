@@ -1,6 +1,6 @@
 #include "GridHelper.h"
 
-string GetCellKey(int i, int j, int k)
+string Helpers::GetCellKey(int i, int j, int k)
 {
     stringstream stream;
     stream << i << "," << j << "," << k;

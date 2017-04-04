@@ -5,4 +5,7 @@
 
 using namespace std;
 
-string GetCellKey(int i, int j, int k);
+namespace Helpers
+{
+    string GetCellKey(int i, int j, int k);
+}

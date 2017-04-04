@@ -19,7 +19,9 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\Core\Helpers\GridHelper.cpp" />
+    <ClCompile Include="src\Core\Helpers\NavierStokesHelper\NavierStokesHelper.cpp" />
+    <ClCompile Include="src\Core\Fluid\Particle\Particle.cpp" />
+    <ClCompile Include="src\Core\Helpers\GridHelper\GridHelper.cpp" />
     <ClCompile Include="src\App\Drawing\GridDrawer\GridDrawer.cpp" />
     <ClCompile Include="src\Core\Fluid\Grid\Grid.cpp" />
     <ClCompile Include="src\Core\Fluid\Cell\FluidCell.cpp" />
@@ -31,7 +33,9 @@
     <ClCompile Include="src\Core\Window\WindowManager\WindowManager.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\Core\Helpers\GridHelper.h" />
+    <ClInclude Include="src\Core\Helpers\NavierStokesHelper\NavierStokesHelper.h" />
+    <ClInclude Include="src\Core\Fluid\Particle\Particle.h" />
+    <ClInclude Include="src\Core\Helpers\GridHelper\GridHelper.h" />
     <ClInclude Include="src\App\Drawing\GridDrawer\GridDrawer.h" />
     <ClInclude Include="src\Core\Fluid\Grid\Grid.h" />
     <ClInclude Include="src\Core\Fluid\Cell\FluidCell.h" />

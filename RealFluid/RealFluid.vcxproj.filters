@@ -42,7 +42,13 @@
     <ClCompile Include="src\Core\Physics\NavierStokesSolver\NavierStokesSolver.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Core\Helpers\GridHelper.cpp">
+    <ClCompile Include="src\Core\Fluid\Particle\Particle.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\Helpers\GridHelper\GridHelper.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\Helpers\NavierStokesHelper\NavierStokesHelper.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -71,7 +77,13 @@
     <ClInclude Include="src\Core\Physics\NavierStokesSolver\NavierStokesSolver.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Core\Helpers\GridHelper.h">
+    <ClInclude Include="src\Core\Fluid\Particle\Particle.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\Helpers\GridHelper\GridHelper.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\Helpers\NavierStokesHelper\NavierStokesHelper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
