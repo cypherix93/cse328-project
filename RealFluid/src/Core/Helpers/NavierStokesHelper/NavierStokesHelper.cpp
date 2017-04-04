@@ -30,7 +30,7 @@ void Helpers::AdjustSolidCellConditions(Grid* grid, FluidCell* cell)
     }
     if (r != nullptr && r->Type != Solid)
     {
-        totalV += -(l->V);
+        totalV += -(r->V);
     }
 
     cell->U = totalU;

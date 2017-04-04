@@ -46,8 +46,10 @@ void Grid::ConstructGrid()
 
             cell->Width = cell->Height = cell->Depth = CellDimensions;
 
-            if (j < 2)
+            if (j < 2 || (i < 1 && j < CellsY - 3) || (i > CellsX - 2 && j < CellsY - 3))
+            {
                 cell->Type = Solid;
+            }
 
             if (cell->Type != Solid && i < 12 && j < 12)
             {
