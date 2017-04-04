@@ -28,7 +28,7 @@ void Grid::ConstructGrid()
 {
     CellsX = Width / CellDimensions;
     CellsY = Height / CellDimensions;
-    CellsZ = 0;
+    CellsZ = 1;
 
     for (auto i = 0; i < CellsX; i++)
     {
@@ -44,7 +44,7 @@ void Grid::ConstructGrid()
             if (j < 2)
                 cell->Type = Solid;
 
-            if (cell->Type != Solid)
+            if (cell->Type != Solid && i < 12)
             {
                 cell->U = 40.0;
                 cell->V = 10.0;

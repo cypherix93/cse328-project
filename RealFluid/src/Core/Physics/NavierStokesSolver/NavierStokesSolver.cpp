@@ -1,7 +1,7 @@
 #include "NavierStokesSolver.h"
 
 auto dt = 1.0;
-auto viscosity = 1.0;
+auto viscosity = 10.0;
 vector<float> gravity = { 0.0f, -9.8f, 0.0f };
 
 /* Public */
@@ -13,8 +13,8 @@ void ProcessGrid(Grid* grid)
 
 void ComputeNewVelocities(Grid* grid)
 {
-    int dx, dy, dz;
-    int dx2, dy2, dz2;
+    double dx, dy, dz;
+    double dx2, dy2, dz2;
 
     auto cells = grid->GetCellsVector();
 
@@ -36,12 +36,13 @@ void ComputeNewVelocities(Grid* grid)
 
         float new_u =
             grid->get_u_plus(i, j, k) +
-            dt * (
-            ((1 / dx) * (pow(grid->get_u_avg(i, j, k), 2) - pow(grid->get_u_avg(i + 1, j, k), 2))) +
-                ((1 / dy) * (grid->get_uv_plus(i, j - 1, k) - grid->get_uv_plus(i, j, k))) +
-                ((1 / dz) * (grid->get_uw_plus(i, j, k - 1) - grid->get_uw_plus(i, j, k))) +
+            dt *
+            (
+            ((1.0 / dx) * (pow(grid->get_u_avg(i, j, k), 2) - pow(grid->get_u_avg(i + 1, j, k), 2))) +
+                ((1.0 / dy) * (grid->get_uv_plus(i, j - 1, k) - grid->get_uv_plus(i, j, k))) +
+                ((1.0 / dz) * (grid->get_uw_plus(i, j, k - 1) - grid->get_uw_plus(i, j, k))) +
                 gravity[0] +
-                (1 / dx) * (grid->getPressure(i, j, k) - grid->getPressure(i + 1, j, k)) +
+                ((1.0 / dx) * (grid->getPressure(i, j, k) - grid->getPressure(i + 1, j, k))) +
                 ((viscosity / dx2) * (grid->get_u_plus(i + 1, j, k) - 2 * grid->get_u_plus(i, j, k) + grid->get_u_plus(i - 1, j, k))) +
                 ((viscosity / dy2) * (grid->get_u_plus(i, j + 1, k) - 2 * grid->get_u_plus(i, j, k) + grid->get_u_plus(i, j - 1, k))) +
                 ((viscosity / dz2) * (grid->get_u_plus(i, j, k + 1) - 2 * grid->get_u_plus(i, j, k) + grid->get_u_plus(i, j, k - 1)))
@@ -49,25 +50,31 @@ void ComputeNewVelocities(Grid* grid)
 
         float new_v =
             grid->get_v_plus(i, j, k) +
-            dt * ((1 / dx) * (grid->get_uv_plus(i - 1, j, k) - grid->get_uv_plus(i, j, k)) +
-            (1 / dy) * (pow(grid->get_v_avg(i, j, k), 2) - pow(grid->get_v_avg(i, j + 1, k), 2)) +
-                (1 / dz) * (grid->get_vw_plus(i, j, k - 1) - grid->get_vw_plus(i, j, k)) +
+            dt *
+            (
+            ((1 / dx) * (grid->get_uv_plus(i - 1, j, k) - grid->get_uv_plus(i, j, k))) +
+                ((1.0 / dy) * (pow(grid->get_v_avg(i, j, k), 2) - pow(grid->get_v_avg(i, j + 1, k), 2))) +
+                ((1.0 / dz) * (grid->get_vw_plus(i, j, k - 1) - grid->get_vw_plus(i, j, k))) +
                 gravity[1] +
-                (1 / dy) * (grid->getPressure(i, j, k) - grid->getPressure(i, j + 1, k)) +
-                (viscosity / dx2) * (grid->get_v_plus(i + 1, j, k) - 2 * grid->get_v_plus(i, j, k) + grid->get_v_plus(i - 1, j, k)) +
-                (viscosity / dy2) * (grid->get_v_plus(i, j + 1, k) - 2 * grid->get_v_plus(i, j, k) + grid->get_v_plus(i, j - 1, k)) +
-                (viscosity / dz2) * (grid->get_v_plus(i, j, k + 1) - 2 * grid->get_v_plus(i, j, k) + grid->get_v_plus(i, j, k - 1)));
+                ((1.0 / dy) * (grid->getPressure(i, j, k) - grid->getPressure(i, j + 1, k))) +
+                ((viscosity / dx2) * (grid->get_v_plus(i + 1, j, k) - 2 * grid->get_v_plus(i, j, k) + grid->get_v_plus(i - 1, j, k))) +
+                ((viscosity / dy2) * (grid->get_v_plus(i, j + 1, k) - 2 * grid->get_v_plus(i, j, k) + grid->get_v_plus(i, j - 1, k))) +
+                ((viscosity / dz2) * (grid->get_v_plus(i, j, k + 1) - 2 * grid->get_v_plus(i, j, k) + grid->get_v_plus(i, j, k - 1)))
+                );
 
         float new_w =
             grid->get_w_plus(i, j, k) +
-            dt * ((1 / dx) * (grid->get_uw_plus(i - 1, j, k) - grid->get_uw_plus(i, j, k)) +
-            (1 / dy) * (grid->get_vw_plus(i, j - 1, k) - grid->get_vw_plus(i, j, k)) +
-                (1 / dz) * (pow(grid->get_w_avg(i, j, k), 2) - pow(grid->get_w_avg(i, j, k + 1), 2)) +
+            dt *
+            (
+            ((1.0 / dx) * (grid->get_uw_plus(i - 1, j, k) - grid->get_uw_plus(i, j, k))) +
+                ((1.0 / dy) * (grid->get_vw_plus(i, j - 1, k) - grid->get_vw_plus(i, j, k))) +
+                ((1.0 / dz) * (pow(grid->get_w_avg(i, j, k), 2) - pow(grid->get_w_avg(i, j, k + 1), 2))) +
                 gravity[2] +
-                (1 / dz) * (grid->getPressure(i, j, k) - grid->getPressure(i, j, k + 1)) +
-                (viscosity / dx2) * (grid->get_w_plus(i + 1, j, k) - 2 * grid->get_w_plus(i, j, k) + grid->get_w_plus(i - 1, j, k)) +
-                (viscosity / dy2) * (grid->get_w_plus(i, j + 1, k) - 2 * grid->get_w_plus(i, j, k) + grid->get_w_plus(i, j - 1, k)) +
-                (viscosity / dz2) * (grid->get_w_plus(i, j, k + 1) - 2 * grid->get_w_plus(i, j, k) + grid->get_w_plus(i, j, k - 1)));
+                ((1.0 / dz) * (grid->getPressure(i, j, k) - grid->getPressure(i, j, k + 1))) +
+                ((viscosity / dx2) * (grid->get_w_plus(i + 1, j, k) - 2 * grid->get_w_plus(i, j, k) + grid->get_w_plus(i - 1, j, k))) +
+                ((viscosity / dy2) * (grid->get_w_plus(i, j + 1, k) - 2 * grid->get_w_plus(i, j, k) + grid->get_w_plus(i, j - 1, k))) +
+                ((viscosity / dz2) * (grid->get_w_plus(i, j, k + 1) - 2 * grid->get_w_plus(i, j, k) + grid->get_w_plus(i, j, k - 1)))
+                );
 
         cell->U = new_u;
         cell->V = new_v;
