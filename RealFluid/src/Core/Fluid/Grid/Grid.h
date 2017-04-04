@@ -1,8 +1,9 @@
 #pragma once
 #include <map>
 
-#include <Core/Helpers/GridHelper.h>
-#include "../Cell/FluidCell.h"
+#include <Core/Helpers/GridHelper/GridHelper.h>
+#include <Core/Fluid/Particle/Particle.h>
+#include <Core/Fluid/Cell/FluidCell.h>
 
 using namespace std;
 
@@ -15,12 +16,15 @@ class Grid
     // Grid Operations
     map<string, FluidCell*>* GetCellsMap();
     vector<FluidCell*>* GetCellsVector();
+    vector<Particle*>* GetParticlesVector();
 
     // Cell Operations
     FluidCell* GetCellAtIndex(int i, int j, int k);
     FluidCell* GetCellAtPixel(int x, int y, int z);
 
     vector<int> GetCellIndex(int x, int y, int z);
+
+    void AddParticle(int x, int y, int z);
 
 
     float get_u_plus(int i, int j, int k) { if (u_boundary(i, j, k)) return 0; return GetCellAtIndex(i, j, k)->U; }
@@ -51,6 +55,8 @@ class Grid
     private:
     map<string, FluidCell*> CellsMap;
     vector<FluidCell*> CellsVector;
+
+    vector<Particle*> ParticlesVector;
 
     int Width, Height;
     int CellsX, CellsY, CellsZ;

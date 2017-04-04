@@ -24,6 +24,11 @@ vector<FluidCell*>* Grid::GetCellsVector()
     return &CellsVector;
 }
 
+vector<Particle*>* Grid::GetParticlesVector()
+{
+    return &ParticlesVector;
+}
+
 void Grid::ConstructGrid()
 {
     CellsX = Width / CellDimensions;
@@ -57,7 +62,7 @@ void Grid::ConstructGrid()
     for (auto cell : CellsVector)
     {
         auto index = GetCellIndex(cell->X, cell->Y, cell->Z);
-        CellsMap[GetCellKey(index[0], index[1], index[2])] = cell;
+        CellsMap[Helpers::GetCellKey(index[0], index[1], index[2])] = cell;
     }
 }
 
@@ -67,14 +72,19 @@ void Grid::DestructGrid()
     {
         free(cell);
     }
+    for (auto particle : ParticlesVector)
+    {
+        free(particle);
+    }
     CellsVector.clear();
     CellsMap.clear();
+    ParticlesVector.clear();
 }
 
 /* Cell Operations */
 FluidCell* Grid::GetCellAtIndex(int i, int j, int k)
 {
-    return CellsMap[GetCellKey(i, j, k)];
+    return CellsMap[Helpers::GetCellKey(i, j, k)];
 }
 
 FluidCell* Grid::GetCellAtPixel(int x, int y, int z)
@@ -91,4 +101,10 @@ vector<int> Grid::GetCellIndex(int x, int y, int z)
     auto k = z / CellDimensions;
 
     return{ i, j, k };
+}
+
+void Grid::AddParticle(int x, int y, int z)
+{
+    auto particle = new Particle(x, y, z);
+    ParticlesVector.push_back(particle);
 }

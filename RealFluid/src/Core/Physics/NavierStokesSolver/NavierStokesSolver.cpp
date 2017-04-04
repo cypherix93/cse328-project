@@ -56,6 +56,8 @@ void ComputeNewVelocities(Grid* grid)
         dy2 = pow(dy, 2);
         dz2 = pow(dz, 2);
 
+        auto emptyGrav = cell->Type == Empty ? 0.0 : 1.0;
+
         float new_u =
             grid->get_u_plus(i, j, k) +
             dt *
@@ -63,7 +65,7 @@ void ComputeNewVelocities(Grid* grid)
             ((1.0 / dx) * (pow(grid->get_u_avg(i, j, k), 2) - pow(grid->get_u_avg(i + 1, j, k), 2))) +
                 ((1.0 / dy) * (grid->get_uv_plus(i, j - 1, k) - grid->get_uv_plus(i, j, k))) +
                 ((1.0 / dz) * (grid->get_uw_plus(i, j, k - 1) - grid->get_uw_plus(i, j, k))) +
-                gravity[0] +
+                (gravity[0] * emptyGrav) +
                 ((1.0 / dx) * (grid->getPressure(i, j, k) - grid->getPressure(i + 1, j, k))) +
                 ((viscosity / dx2) * (grid->get_u_plus(i + 1, j, k) - 2 * grid->get_u_plus(i, j, k) + grid->get_u_plus(i - 1, j, k))) +
                 ((viscosity / dy2) * (grid->get_u_plus(i, j + 1, k) - 2 * grid->get_u_plus(i, j, k) + grid->get_u_plus(i, j - 1, k))) +
@@ -77,7 +79,7 @@ void ComputeNewVelocities(Grid* grid)
             ((1 / dx) * (grid->get_uv_plus(i - 1, j, k) - grid->get_uv_plus(i, j, k))) +
                 ((1.0 / dy) * (pow(grid->get_v_avg(i, j, k), 2) - pow(grid->get_v_avg(i, j + 1, k), 2))) +
                 ((1.0 / dz) * (grid->get_vw_plus(i, j, k - 1) - grid->get_vw_plus(i, j, k))) +
-                gravity[1] +
+                (gravity[1] * emptyGrav) +
                 ((1.0 / dy) * (grid->getPressure(i, j, k) - grid->getPressure(i, j + 1, k))) +
                 ((viscosity / dx2) * (grid->get_v_plus(i + 1, j, k) - 2 * grid->get_v_plus(i, j, k) + grid->get_v_plus(i - 1, j, k))) +
                 ((viscosity / dy2) * (grid->get_v_plus(i, j + 1, k) - 2 * grid->get_v_plus(i, j, k) + grid->get_v_plus(i, j - 1, k))) +
@@ -91,7 +93,7 @@ void ComputeNewVelocities(Grid* grid)
             ((1.0 / dx) * (grid->get_uw_plus(i - 1, j, k) - grid->get_uw_plus(i, j, k))) +
                 ((1.0 / dy) * (grid->get_vw_plus(i, j - 1, k) - grid->get_vw_plus(i, j, k))) +
                 ((1.0 / dz) * (pow(grid->get_w_avg(i, j, k), 2) - pow(grid->get_w_avg(i, j, k + 1), 2))) +
-                gravity[2] +
+                (gravity[2] * emptyGrav) +
                 ((1.0 / dz) * (grid->getPressure(i, j, k) - grid->getPressure(i, j, k + 1))) +
                 ((viscosity / dx2) * (grid->get_w_plus(i + 1, j, k) - 2 * grid->get_w_plus(i, j, k) + grid->get_w_plus(i - 1, j, k))) +
                 ((viscosity / dy2) * (grid->get_w_plus(i, j + 1, k) - 2 * grid->get_w_plus(i, j, k) + grid->get_w_plus(i, j - 1, k))) +
@@ -121,21 +123,7 @@ void AdjustBoundaryConditions(Grid* grid)
     {
         auto cell = cells[c];
 
-        if (cell->Type != Solid)
-            continue;
-
-        int i, j, k;
-        auto index = grid->GetCellIndex(cell->X, cell->Y, cell->Z);
-        i = index[0];
-        j = index[1];
-        k = index[2];
-
-        auto cellAbove = grid->GetCellAtIndex(i, j + 1, k);
-        cell->Pressure = cellAbove->Type != Solid ? cellAbove->Pressure : 0.0;
-
-        cell->U = cellAbove->Type != Solid ? -cellAbove->U : 0.0;
-        cell->V = 0.0;
-        cell->W = 0.0;
+        Helpers::AdjustSolidCellConditions(grid, cell);
     }
 }
 
@@ -171,6 +159,19 @@ void AdjustForIncompressibility(Grid* grid)
             needsReprocessing = (iters < 3) && (abs(D) > EPSILON);
         }
     } while (needsReprocessing);
+}
+
+void MoveParticles(Grid* grid)
+{
+    auto particles = *(grid->GetParticlesVector());
+
+    #pragma omp parallel for
+    for (auto p = 0; p < particles.size(); p++)
+    {
+        auto particle = particles[p];
+
+
+    }
 }
 
 float ComputeDivergence(FluidCell* cell)

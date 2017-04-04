@@ -1,6 +1,6 @@
 #pragma once
 #include <Core/Fluid/Grid/Grid.h>
-#include <omp.h>
+#include <Core/Helpers/NavierStokesHelper/NavierStokesHelper.h>
 
 #define EPSILON 0.1
 #define BETA_0 1.7
@@ -27,6 +27,8 @@ static void ComputeNewVelocities(Grid* grid);
 
 static void AdjustBoundaryConditions(Grid* grid);
 static void AdjustForIncompressibility(Grid* grid);
+
+static void MoveParticles(Grid* grid);
 
 static float ComputeDivergence(FluidCell* cell);
 static float ComputeBeta(FluidCell* cell);
