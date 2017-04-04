@@ -4,11 +4,16 @@ auto dt = 1.0 / 10.0;
 auto viscosity = 10.0;
 vector<float> gravity = { 0.0f, -9.8f, 0.0f };
 
+auto particlesAdded = 0;
 
 /* Public */
 void ProcessGrid(Grid* grid)
 {
-    AddParticles(grid);
+    if (particlesAdded < 10)
+    {
+        particlesAdded++;
+        AddParticles(grid);
+    }
     UpdateCellsWithParticles(grid);
     MoveParticles(grid);
 
@@ -64,7 +69,7 @@ void ComputeNewVelocities(Grid* grid)
         dy2 = pow(dy, 2);
         dz2 = pow(dz, 2);
 
-        auto emptyGrav = cell->Type == Empty ? 0.0 : 1.0;
+        auto emptyGrav = cell->Type == Empty ? 1.0 : 1.0;
 
         float new_u =
             grid->get_u_plus(i, j, k) +
@@ -189,19 +194,6 @@ void UpdateCellsWithParticles(Grid* grid)
 {
     auto particles = *(grid->GetParticlesVector());
 
-    // First set all cells with particles to full
-    #pragma omp parallel for
-    for (auto p = 0; p < particles.size(); p++)
-    {
-        auto particle = particles[p];
-
-        auto cell = grid->GetCellAtPixel(particle->X, particle->Y, particle->Z);
-
-        if (cell != nullptr && cell->Type != Solid)
-            cell->Type = Full;
-    }
-
-    // Now compute which cells are surface
     auto cells = *(grid->GetCellsVector());
 
     int i, j, k;
@@ -211,7 +203,25 @@ void UpdateCellsWithParticles(Grid* grid)
     {
         auto cell = cells[c];
 
-        if (cell->Type == Solid)
+        // First see if any particles are in this cell
+        auto isFull = false;
+
+        #pragma omp parallel for
+        for (auto p = 0; p < particles.size(); p++)
+        {
+            auto particle = particles[p];
+
+            auto particleCell = grid->GetCellAtPixel(particle->X, particle->Y, particle->Z);
+
+            if (particleCell == cell)
+                isFull = true;
+        }
+
+        if (cell->Type != Solid)
+            cell->Type = isFull ? Full : Empty;
+
+        // If cell was deemed full, determine if it is a surface
+        if (cell->Type != Full)
             continue;
 
         auto index = grid->GetCellIndex(cell->X, cell->Y, cell->Z);

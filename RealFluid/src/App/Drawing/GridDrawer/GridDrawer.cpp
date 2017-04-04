@@ -17,13 +17,6 @@ void DrawCellGrid(Grid* grid, GridDrawOptions* options)
     if (options == nullptr)
         options = new GridDrawOptions();
 
-    auto cells = grid->GetCellsVector();
-
-    for (auto &cell : *cells)
-    {
-        DrawCell(cell, options);
-    }
-
     if (options->DrawParticles)
     {
         auto particles = grid->GetParticlesVector();
@@ -32,6 +25,13 @@ void DrawCellGrid(Grid* grid, GridDrawOptions* options)
         {
             DrawParticle(particle);
         }
+    }
+
+    auto cells = grid->GetCellsVector();
+
+    for (auto &cell : *cells)
+    {
+        DrawCell(cell, options);
     }
 }
 
@@ -50,7 +50,7 @@ void DrawCell(FluidCell* cell, GridDrawOptions* options)
 void DrawParticle(Particle* particle)
 {
     glPointSize(6.0);
-    glColor4f(0.57f, 0.63f, 0.9f, 1.0f);
+    glColor4f(0.57f, 0.9f, 0.63f, 1.0f);
 
     glBegin(GL_POINTS);
 
