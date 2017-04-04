@@ -1,5 +1,4 @@
 #include "NavierStokesSolver.h"
-#include <iostream>
 
 auto dt = 1.0 / 10.0;
 auto viscosity = 10.0;
@@ -80,10 +79,35 @@ void ComputeNewVelocities(Grid* grid)
                 ((viscosity / dz2) * (grid->get_w_plus(i, j, k + 1) - 2 * grid->get_w_plus(i, j, k) + grid->get_w_plus(i, j, k - 1)))
                 );
 
-        cell->U = new_u;
-        cell->V = new_v;
-        cell->W = new_w;
+        // Update the values into the buffer to later replace the grid with
+        struct UpdatedCellVector newVector;
+        newVector.I = i;
+        newVector.J = j;
+        newVector.K = k;
+        newVector.U = new_u;
+        newVector.V = new_v;
+        newVector.W = new_w;
+
+        UpdatedCellVectorBuffer.push_back(newVector);
     }
+
+    UpdateNewVelocities(grid);
+}
+
+void UpdateNewVelocities(Grid* grid)
+{
+    #pragma omp parallel for
+    for (auto it = UpdatedCellVectorBuffer.begin(); it < UpdatedCellVectorBuffer.end(); ++it)
+    {
+        auto update = *it;
+
+        auto cell = grid->GetCellAtIndex(update.I, update.J, update.K);
+        cell->U = update.U;
+        cell->V = update.V;
+        cell->W = update.W;
+    }
+
+    UpdatedCellVectorBuffer.clear();
 }
 
 /* Private */
@@ -142,3 +166,4 @@ float ComputeDeltaPressure(float beta, float divergence)
 {
     return beta * divergence;
 }
+
