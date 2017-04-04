@@ -23,13 +23,13 @@ class Grid
     vector<int> GetCellIndex(int x, int y, int z);
 
 
-    float get_u_avg(int i, int j, int k) { return 0.5*(get_u_plus(i - 1, j, k) + get_u_plus(i, j, k)); }
-    float get_v_avg(int i, int j, int k) { return 0.5*(get_v_plus(i, j - 1, k) + get_v_plus(i, j, k)); }
-    float get_w_avg(int i, int j, int k) { return 0.5*(get_w_plus(i, j, k - 1) + get_w_plus(i, j, k)); }
-
     float get_u_plus(int i, int j, int k) { if (u_boundary(i, j, k)) return 0; return GetCellAtIndex(i, j, k)->U; }
     float get_v_plus(int i, int j, int k) { if (v_boundary(i, j, k)) return 0; return GetCellAtIndex(i, j, k)->V; }
     float get_w_plus(int i, int j, int k) { if (w_boundary(i, j, k)) return 0; return GetCellAtIndex(i, j, k)->W; }
+
+    float get_u_avg(int i, int j, int k) { return 0.5*(get_u_plus(i - 1, j, k) + get_u_plus(i, j, k)); }
+    float get_v_avg(int i, int j, int k) { return 0.5*(get_v_plus(i, j - 1, k) + get_v_plus(i, j, k)); }
+    float get_w_avg(int i, int j, int k) { return 0.5*(get_w_plus(i, j, k - 1) + get_w_plus(i, j, k)); }
 
     float get_uv_plus(int i, int j, int k) {
         return 0.5*(get_u_plus(i, j, k) + get_u_plus(i, j + 1, k)) * 0.5*(get_v_plus(i, j, k) + get_v_plus(i + 1, j, k));

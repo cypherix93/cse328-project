@@ -19,9 +19,9 @@ void ComputeNewVelocities(Grid* grid)
     auto cells = *(grid->GetCellsVector());
 
     #pragma omp parallel for
-    for (auto it = cells.begin(); it < cells.end(); ++it)
+    for (auto c = 0; c < cells.size(); c++)
     {
-        auto cell = *it;
+        auto cell = cells[c];
 
         int i, j, k;
         auto index = grid->GetCellIndex(cell->X, cell->Y, cell->Z);
@@ -97,9 +97,9 @@ void ComputeNewVelocities(Grid* grid)
 void UpdateNewVelocities(Grid* grid)
 {
     #pragma omp parallel for
-    for (auto it = UpdatedCellVectorBuffer.begin(); it < UpdatedCellVectorBuffer.end(); ++it)
+    for (auto c = 0; c < UpdatedCellVectorBuffer.size(); c++)
     {
-        auto update = *it;
+        auto update = UpdatedCellVectorBuffer[c];
 
         auto cell = grid->GetCellAtIndex(update.I, update.J, update.K);
         cell->U = update.U;

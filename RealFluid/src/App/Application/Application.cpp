@@ -17,7 +17,7 @@ void Application::Setup()
 {
     omp_set_dynamic(0);
     auto t = omp_get_max_threads();
-    omp_set_num_threads(t);
+    omp_set_num_threads(t-2);
 
     //Set handler functions
     _WindowManager->OnInit(InitHandler);
@@ -35,5 +35,5 @@ void Application::Start()
     _WindowManager->OpenWindow("Real Fluid - CSE 328 Project", WINDOW_WIDTH, WINDOW_HEIGHT);
 
     // Start Window Lifecycle
-    _WindowManager->Start(5);
+    _WindowManager->Start(10);
 }
