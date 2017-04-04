@@ -1,8 +1,8 @@
 #pragma once
 #include <map>
 
+#include <Core/Helpers/GridHelper.h>
 #include "../Cell/FluidCell.h"
-#include "../../../../GridHelper.h"
 
 using namespace std;
 

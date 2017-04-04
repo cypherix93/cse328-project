@@ -1,6 +1,7 @@
 #include "NavierStokesSolver.h"
+#include <iostream>
 
-auto dt = 1.0 / 60.0;
+auto dt = 1.0 / 10.0;
 auto viscosity = 10.0;
 vector<float> gravity = { 0.0f, -9.8f, 0.0f };
 
@@ -8,7 +9,7 @@ vector<float> gravity = { 0.0f, -9.8f, 0.0f };
 void ProcessGrid(Grid* grid)
 {
     ComputeNewVelocities(grid);
-//    AdjustForIncompressibility(grid);
+    AdjustForIncompressibility(grid);
 }
 
 void ComputeNewVelocities(Grid* grid)
@@ -16,10 +17,13 @@ void ComputeNewVelocities(Grid* grid)
     double dx, dy, dz;
     double dx2, dy2, dz2;
 
-    auto cells = grid->GetCellsVector();
+    auto cells = *(grid->GetCellsVector());
 
-    for (auto &cell : *cells)
-    {
+    #pragma omp parallel for
+    for (auto it = cells.begin(); it < cells.end(); ++it)
+    {        
+        auto cell = *it;
+
         int i, j, k;
         auto index = grid->GetCellIndex(cell);
         i = index[0];

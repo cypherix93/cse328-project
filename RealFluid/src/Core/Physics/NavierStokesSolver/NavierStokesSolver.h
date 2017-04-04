@@ -1,5 +1,6 @@
 #pragma once
 #include <Core/Fluid/Grid/Grid.h>
+#include <omp.h>
 
 #define EPSILON 0.1
 #define BETA_0 1.7

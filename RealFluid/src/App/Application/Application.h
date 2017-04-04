@@ -1,5 +1,6 @@
 #pragma once
 #include <iostream>
+#include <omp.h>
 #include "../../Core/Window/WindowManager/WindowManager.h"
 #include "EventHandlers.h"
 

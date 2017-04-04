@@ -44,7 +44,7 @@ void Grid::ConstructGrid()
             if (j < 2)
                 cell->Type = Solid;
 
-            if (cell->Type != Solid && i < 12)
+            if (cell->Type != Solid && i < 12 && j < 12)
             {
                 cell->U = 40.0;
                 cell->V = 10.0;
