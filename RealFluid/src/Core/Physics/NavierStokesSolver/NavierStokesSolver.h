@@ -2,7 +2,7 @@
 #include <Core/Fluid/Grid/Grid.h>
 #include <Core/Helpers/NavierStokesHelper/NavierStokesHelper.h>
 
-#define EPSILON 0.1
+#define EPSILON 0.0001
 #define BETA_0 1.7
 
 struct UpdatedCellVector
@@ -31,7 +31,3 @@ static void AdjustForIncompressibility(Grid* grid);
 static void AddParticles(Grid* grid);
 static void UpdateCellsWithParticles(Grid* grid);
 static void MoveParticles(Grid* grid);
-
-static float ComputeDivergence(FluidCell* cell);
-static float ComputeBeta(FluidCell* cell);
-static float ComputeDeltaPressure(float beta, float divergence);

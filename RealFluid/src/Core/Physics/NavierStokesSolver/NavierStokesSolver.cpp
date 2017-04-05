@@ -20,7 +20,7 @@ void ProcessGrid(Grid* grid)
 
     AdjustBoundaryConditions(grid);
     UpdateNewVelocities(grid);
-    AdjustForIncompressibility(grid);
+//    AdjustForIncompressibility(grid);
 
     MoveParticles(grid);
 }
@@ -45,9 +45,6 @@ void UpdateNewVelocities(Grid* grid)
 
 void ComputeNewVelocities(Grid* grid)
 {
-    double dx, dy, dz;
-    double dx2, dy2, dz2;
-
     auto cells = *(grid->GetCellsVector());
 
     #pragma omp parallel for
@@ -59,6 +56,9 @@ void ComputeNewVelocities(Grid* grid)
             continue;
 
         int i, j, k;
+        double dx, dy, dz;
+        double dx2, dy2, dz2;
+
         auto index = grid->GetCellIndex(cell->X, cell->Y, cell->Z);
         i = index[0];
         j = index[1];
@@ -145,8 +145,6 @@ void AdjustBoundaryConditions(Grid* grid)
 
 void AdjustForIncompressibility(Grid* grid)
 {
-    float D, B, dp;
-
     auto iters = 0;
     auto needsReprocessing = false;
 
@@ -161,15 +159,67 @@ void AdjustForIncompressibility(Grid* grid)
         {
             auto cell = cells[c];
 
-            D = ComputeDivergence(cell);
-            B = ComputeBeta(cell);
+            int i, j, k;
+            double dx, dy, dz;
+            double dx2, dy2, dz2;
+            float du, dv, dw;
 
-            dp = ComputeDeltaPressure(B, D);
+            float Dx, Dy, Dz;
+            float betaDenom;
 
-            cell->U += (dt / cell->Width) * dp;
-            cell->V += (dt / cell->Height) * dp;
-            cell->W += (dt / cell->Depth) * dp;
+            float D, B, dp;
 
+            auto index = grid->GetCellIndex(cell->X, cell->Y, cell->Z);
+            i = index[0];
+            j = index[1];
+            k = index[2];
+
+            dx = cell->Width;
+            dy = cell->Height;
+            dz = cell->Depth;
+
+            dx2 = pow(dx, 2);
+            dy2 = pow(dy, 2);
+            dz2 = pow(dz, 2);
+
+            // Divergence
+            Dx = (1.0 / dx) * (grid->get_u_plus(i + 1, j, k) - grid->get_u_plus(i, j, k));
+            Dy = (1.0 / dy) * (grid->get_v_plus(i, j + 1, k) - grid->get_v_plus(i, j, k));
+            Dz = (1.0 / dz) * (grid->get_w_plus(i, j, k + 1) - grid->get_w_plus(i, j, k));
+
+            D = -(Dx + Dy + Dz);
+
+            // Beta
+            betaDenom = (2.0 * dt) * ((1.0 / dx2) + (1.0 / dy2) + (1.0 / dz2));
+
+            B = BETA_0 / betaDenom;
+
+            // Pressure
+            dp = B * D;
+
+            // Change in velocity due to pressure
+            du = (dt / dx) * dp;
+            dv = (dt / dy) * dp;
+            dw = (dt / dz) * dp;
+
+            // Update this cell
+            cell->U -= du;
+            cell->V -= dv;
+            cell->W -= dw;
+
+            // Update next cells 
+            auto next_x = grid->GetCellAtIndex(i + 1, j, k);
+            auto next_y = grid->GetCellAtIndex(i, j + 1, k);
+            auto next_z = grid->GetCellAtIndex(i, j, k + 1);
+
+            if (next_x != nullptr)
+                next_x->U += du;
+            if (next_y != nullptr)
+                next_y->V += dv;
+            if (next_z != nullptr)
+                next_z->W += dw;
+
+            // Update this cell's pressure
             cell->Pressure += dp;
 
             needsReprocessing = (iters < 3) && (abs(D) > EPSILON);
@@ -265,29 +315,3 @@ void MoveParticles(Grid* grid)
             particle->MoveBy(cell->U * dt, cell->V * dt, cell->W * dt);
     }
 }
-
-float ComputeDivergence(FluidCell* cell)
-{
-    auto Dx = (1.0 / cell->Width) * cell->U;
-    auto Dy = (1.0 / cell->Height) * cell->V;
-    auto Dz = (1.0 / cell->Depth) * cell->W;
-
-    return -(Dx + Dy + Dz);
-}
-
-float ComputeBeta(FluidCell* cell)
-{
-    auto i_dx2 = 1 / pow(cell->Width, 2);
-    auto i_dy2 = 1 / pow(cell->Height, 2);
-    auto i_dz2 = 1 / pow(cell->Depth, 2);
-
-    auto denom = (2 * dt) / (i_dx2 + i_dy2 + i_dz2);
-
-    return BETA_0 / denom;
-}
-
-float ComputeDeltaPressure(float beta, float divergence)
-{
-    return beta * divergence;
-}
-
