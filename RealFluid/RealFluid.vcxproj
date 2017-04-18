@@ -41,6 +41,8 @@
     <ClInclude Include="src\Core\Fluid\Cell\FluidCell.h" />
     <ClInclude Include="src\App\Application\Application.h" />
     <ClInclude Include="src\App\Application\EventHandlers.h" />
+    <ClInclude Include="src\Core\Physics\Models\Coordinate.h" />
+    <ClInclude Include="src\Core\Physics\Models\Velocity.h" />
     <ClInclude Include="src\Core\Physics\NavierStokesSolver\NavierStokesSolver.h" />
     <ClInclude Include="src\Core\StateManager\StateManager.h" />
     <ClInclude Include="src\Core\Window\WindowManager\WindowManager.h" />

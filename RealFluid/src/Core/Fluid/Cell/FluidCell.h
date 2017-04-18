@@ -2,6 +2,7 @@
 
 #include <GL/glew.h>
 #include <vector>
+#include <Core/Physics/Models/Coordinate.h>
 
 using namespace std;
 
@@ -36,7 +37,7 @@ class FluidCell
     float Pressure;
 
     // Getters
-    vector<int> GetPositionVector() const;
+    Coordinate GetCoordinates() const;
 
     // Drawers
     void DrawContents() const;

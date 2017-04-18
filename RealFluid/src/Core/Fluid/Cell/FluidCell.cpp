@@ -23,9 +23,9 @@ FluidCell::~FluidCell()
 {
 }
 
-vector<int> FluidCell::GetPositionVector() const
+Coordinate FluidCell::GetCoordinates() const
 {
-    return{ X, Y, Z };
+    return Coordinate(X, Y, Z);
 }
 
 void FluidCell::DrawContents() const
@@ -41,7 +41,7 @@ void FluidCell::DrawContents() const
     {
         glColor4f(0.8f, 0.63f, 0.44f, 1.0f);
     }
-    else if(Type == Surface)
+    else if (Type == Surface)
     {
         glColor4f(0.75f, 0.85f, 0.95f, 1.0f);
     }

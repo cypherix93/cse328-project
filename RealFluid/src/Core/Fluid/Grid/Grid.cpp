@@ -14,6 +14,11 @@ Grid::~Grid()
     DestructGrid();
 }
 
+int Grid::GetCellDimensions()
+{
+    return CellDimensions;
+}
+
 map<string, FluidCell*>* Grid::GetCellsMap()
 {
     return &CellsMap;
@@ -95,6 +100,12 @@ FluidCell* Grid::GetCellAtPixel(int x, int y, int z)
 
     return GetCellAtIndex(index[0], index[1], index[2]);
 }
+
+FluidCell* Grid::GetCellAtCoordinate(Coordinate coord)
+{
+    return GetCellAtPixel(coord.X, coord.Y, coord.Z);
+}
+
 
 vector<int> Grid::GetCellIndex(int x, int y, int z)
 {

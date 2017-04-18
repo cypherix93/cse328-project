@@ -4,6 +4,7 @@
 #include <Core/Helpers/GridHelper/GridHelper.h>
 #include <Core/Fluid/Particle/Particle.h>
 #include <Core/Fluid/Cell/FluidCell.h>
+#include <Core/Physics/Models/Coordinate.h>
 
 using namespace std;
 
@@ -14,6 +15,8 @@ class Grid
     virtual ~Grid();
 
     // Grid Operations
+    int GetCellDimensions();
+
     map<string, FluidCell*>* GetCellsMap();
     vector<FluidCell*>* GetCellsVector();
     vector<Particle*>* GetParticlesVector();
@@ -21,6 +24,7 @@ class Grid
     // Cell Operations
     FluidCell* GetCellAtIndex(int i, int j, int k);
     FluidCell* GetCellAtPixel(int x, int y, int z);
+    FluidCell* GetCellAtCoordinate(Coordinate coord);
 
     vector<int> GetCellIndex(int x, int y, int z);
 

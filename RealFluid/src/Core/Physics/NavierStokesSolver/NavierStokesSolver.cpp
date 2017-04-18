@@ -20,7 +20,7 @@ void ProcessGrid(Grid* grid)
 
     AdjustBoundaryConditions(grid);
     UpdateNewVelocities(grid);
-//    AdjustForIncompressibility(grid);
+    //    AdjustForIncompressibility(grid);
 
     MoveParticles(grid);
 }
@@ -30,7 +30,8 @@ void UpdateNewVelocities(Grid* grid)
     ComputeNewVelocities(grid);
 
     #pragma omp parallel for
-    for (auto c = 0; c < UpdatedCellVectorBuffer.size(); c++)
+    for (auto c = 0; c < UpdatedCellVectorBuffer.size();
+        c++)
     {
         auto update = UpdatedCellVectorBuffer[c];
 
@@ -47,6 +48,14 @@ void ComputeNewVelocities(Grid* grid)
 {
     auto cells = *(grid->GetCellsVector());
 
+    double dx, dy, dz;
+    double dx2, dy2, dz2;
+
+    dx = dy = dz = grid->GetCellDimensions();
+    dx2 = pow(dx, 2);
+    dy2 = pow(dy, 2);
+    dz2 = pow(dz, 2);
+
     #pragma omp parallel for
     for (auto c = 0; c < cells.size(); c++)
     {
@@ -56,21 +65,10 @@ void ComputeNewVelocities(Grid* grid)
             continue;
 
         int i, j, k;
-        double dx, dy, dz;
-        double dx2, dy2, dz2;
-
         auto index = grid->GetCellIndex(cell->X, cell->Y, cell->Z);
         i = index[0];
         j = index[1];
         k = index[2];
-
-        dx = cell->Width;
-        dy = cell->Height;
-        dz = cell->Depth;
-
-        dx2 = pow(dx, 2);
-        dy2 = pow(dy, 2);
-        dz2 = pow(dz, 2);
 
         auto emptyGrav = cell->Type == Empty ? 1.0 : 1.0;
 
@@ -311,7 +309,10 @@ void MoveParticles(Grid* grid)
 
         auto cell = grid->GetCellAtPixel(particle->X, particle->Y, particle->Z);
 
-        if (cell != nullptr)
-            particle->MoveBy(cell->U * dt, cell->V * dt, cell->W * dt);
+        if (cell == nullptr)
+            continue;
+
+
+        particle->MoveBy(cell->U, cell->V, cell->W);
     }
 }
