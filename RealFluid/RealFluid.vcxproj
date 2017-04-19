@@ -33,9 +33,9 @@
     <ClCompile Include="src\Core\Window\WindowManager\WindowManager.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Core\Helpers\GridHelper\GridHelper.h" />
     <ClInclude Include="src\Core\Helpers\NavierStokesHelper\NavierStokesHelper.h" />
     <ClInclude Include="src\Core\Fluid\Particle\Particle.h" />
-    <ClInclude Include="src\Core\Helpers\GridHelper\GridHelper.h" />
     <ClInclude Include="src\App\Drawing\GridDrawer\GridDrawer.h" />
     <ClInclude Include="src\Core\Fluid\Grid\Grid.h" />
     <ClInclude Include="src\Core\Fluid\Cell\FluidCell.h" />
@@ -116,7 +116,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
-      <AdditionalIncludeDirectories>D:\src\cse328\cse328-project\RealFluid\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OpenMPSupport>true</OpenMPSupport>
     </ClCompile>
   </ItemDefinitionGroup>

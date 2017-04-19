@@ -1,6 +1,5 @@
 #pragma once
 #include <Core/Fluid/Grid/Grid.h>
-#include <Core/Helpers/NavierStokesHelper/NavierStokesHelper.h>
 
 #define EPSILON 0.0001
 #define BETA_0 1.7

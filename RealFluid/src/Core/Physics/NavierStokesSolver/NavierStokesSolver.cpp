@@ -1,5 +1,8 @@
 #include "NavierStokesSolver.h"
 
+#include <Core/Helpers/NavierStokesHelper/NavierStokesHelper.h>
+#include <Core/Helpers/GridHelper/GridHelper.h>
+
 auto dt = 1.0 / 20.0;
 auto viscosity = 0.0001;
 vector<float> gravity = { 0.0f, -9.8f, 0.0f };
@@ -307,12 +310,8 @@ void MoveParticles(Grid* grid)
     {
         auto particle = particles[p];
 
-        auto cell = grid->GetCellAtPixel(particle->X, particle->Y, particle->Z);
+        auto velocity = Helpers::ComputeParticleVelocity(grid, particle);
 
-        if (cell == nullptr)
-            continue;
-
-
-        particle->MoveBy(cell->U, cell->V, cell->W);
+        particle->MoveBy(velocity.U, velocity.V, velocity.W);
     }
 }

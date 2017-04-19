@@ -1,5 +1,7 @@
 #include "Grid.h"
 
+#include <Core/Helpers/GridHelper/GridHelper.h>
+
 Grid::Grid(int width, int height, int cellDimensions)
 {
     Width = width;

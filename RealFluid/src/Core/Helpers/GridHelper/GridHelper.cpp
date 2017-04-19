@@ -8,9 +8,9 @@ string Helpers::GetCellKey(int i, int j, int k)
     return stream.str();
 }
 
-vector<float> Helpers::ComputeParticleVelocity(Grid* grid, Particle* particle)
+Velocity Helpers::ComputeParticleVelocity(Grid* grid, Particle* particle)
 {
-    float u = 0, v = 0, w = 0;
+    float u, v;
 
     auto dim = grid->GetCellDimensions();
 
@@ -37,8 +37,29 @@ vector<float> Helpers::ComputeParticleVelocity(Grid* grid, Particle* particle)
     };
 
     // Area Interpolation
-    auto pbrk = neighborCells[2]->GetCoordinates();
+    Coordinate pbrk;
     float a1, a2, a3, a4;
+
+    if (neighborCells[2] != nullptr)
+    {
+        pbrk = neighborCells[2]->GetCoordinates();
+    }
+    else if (neighborCells[0] != nullptr)
+    {
+        pbrk = neighborCells[0]->GetCoordinates();
+        pbrk.X += dim;
+        pbrk.Y -= dim;
+    }
+    else if (neighborCells[1] != nullptr)
+    {
+        pbrk = neighborCells[1]->GetCoordinates();
+        pbrk.Y -= dim;
+    }
+    else if (neighborCells[3] != nullptr)
+    {
+        pbrk = neighborCells[3]->GetCoordinates();
+        pbrk.X += dim;
+    }
 
     a1 = abs(pbrk.X - particleBounds[0].X) * abs(pbrk.Y - particleBounds[0].Y);
     a2 = abs(pbrk.X - particleBounds[1].X) * abs(pbrk.Y - particleBounds[1].Y);
@@ -46,16 +67,16 @@ vector<float> Helpers::ComputeParticleVelocity(Grid* grid, Particle* particle)
     a4 = abs(pbrk.X - particleBounds[3].X) * abs(pbrk.Y - particleBounds[3].Y);
 
     // Compute U
-    u = (a1 * neighborCells[0]->U) +
-        (a2 * neighborCells[1]->U) +
-        (a3 * neighborCells[2]->U) +
-        (a4 * neighborCells[3]->U);
+    u = (neighborCells[0] == nullptr ? 0 : (a1 * neighborCells[0]->U)) +
+        (neighborCells[1] == nullptr ? 0 : (a2 * neighborCells[1]->U)) +
+        (neighborCells[2] == nullptr ? 0 : (a3 * neighborCells[2]->U)) +
+        (neighborCells[3] == nullptr ? 0 : (a4 * neighborCells[3]->U));
 
     // Compute V
-    v = (a1 * neighborCells[0]->V) +
-        (a2 * neighborCells[1]->V) +
-        (a3 * neighborCells[2]->V) +
-        (a4 * neighborCells[3]->V);
+    v = (neighborCells[0] == nullptr ? 0 : (a1 * neighborCells[0]->V)) +
+        (neighborCells[1] == nullptr ? 0 : (a2 * neighborCells[1]->V)) +
+        (neighborCells[2] == nullptr ? 0 : (a3 * neighborCells[2]->V)) +
+        (neighborCells[3] == nullptr ? 0 : (a4 * neighborCells[3]->V));
 
-    return{ u, v, w };
+    return Velocity(u, v);
 }

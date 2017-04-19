@@ -1,7 +1,6 @@
 #pragma once
 #include <map>
 
-#include <Core/Helpers/GridHelper/GridHelper.h>
 #include <Core/Fluid/Particle/Particle.h>
 #include <Core/Fluid/Cell/FluidCell.h>
 #include <Core/Physics/Models/Coordinate.h>
