@@ -49,7 +49,7 @@ void Grid::ConstructGrid()
             auto cell = new FluidCell();
             cell->X = CellDimensions * i;
             cell->Y = CellDimensions * j;
-            cell->Z = 0;
+            cell->Z = CellDimensions * 0;
 
             cell->Width = cell->Height = cell->Depth = CellDimensions;
 
