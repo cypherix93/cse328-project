@@ -5,7 +5,7 @@
 
 auto dt = 1.0 / 20.0;
 auto viscosity = 0.0001;
-vector<float> gravity = { 0.0f, -9.8f, 0.0f };
+Velocity gravity{ 0.0f, -9.8f, 0.0f };
 
 auto particlesAdded = 0;
 
@@ -85,7 +85,7 @@ void ComputeNewVelocities(Grid* grid)
         j = index[1];
         k = index[2];
 
-        auto emptyGrav = cell->Type == Empty ? 1.0 : 1.0;
+        auto emptyGrav = cell->Type == Empty ? 0.0 : 1.0;
 
         float new_u =
             grid->GetCellU(i, j, k) +
@@ -94,7 +94,7 @@ void ComputeNewVelocities(Grid* grid)
             ((1.0 / dx) * (pow(grid->GetCellAverageU(i, j, k), 2) - pow(grid->GetCellAverageU(i + 1, j, k), 2))) +
                 ((1.0 / dy) * (grid->GetCellUV(i, j - 1, k) - grid->GetCellUV(i, j, k))) +
                 ((1.0 / dz) * (grid->GetCellWU(i, j, k - 1) - grid->GetCellWU(i, j, k))) +
-                (gravity[0] * emptyGrav) +
+                (gravity.U * emptyGrav) +
                 ((1.0 / dx) * (grid->GetCellPressure(i, j, k) - grid->GetCellPressure(i + 1, j, k))) +
                 (v_dx2 * (grid->GetCellU(i + 1, j, k) - (2 * grid->GetCellU(i, j, k)) + grid->GetCellU(i - 1, j, k))) +
                 (v_dy2 * (grid->GetCellU(i, j + 1, k) - (2 * grid->GetCellU(i, j, k)) + grid->GetCellU(i, j - 1, k))) +
@@ -108,7 +108,7 @@ void ComputeNewVelocities(Grid* grid)
             ((1 / dx) * (grid->GetCellUV(i - 1, j, k) - grid->GetCellUV(i, j, k))) +
                 ((1.0 / dy) * (pow(grid->GetCellAverageV(i, j, k), 2) - pow(grid->GetCellAverageV(i, j + 1, k), 2))) +
                 ((1.0 / dz) * (grid->GetCellVW(i, j, k - 1) - grid->GetCellVW(i, j, k))) +
-                (gravity[1] * emptyGrav) +
+                (gravity.V * emptyGrav) +
                 ((1.0 / dy) * (grid->GetCellPressure(i, j, k) - grid->GetCellPressure(i, j + 1, k))) +
                 (v_dx2 * (grid->GetCellV(i + 1, j, k) - 2 * grid->GetCellV(i, j, k) + grid->GetCellV(i - 1, j, k))) +
                 (v_dy2 * (grid->GetCellV(i, j + 1, k) - 2 * grid->GetCellV(i, j, k) + grid->GetCellV(i, j - 1, k))) +
@@ -122,7 +122,7 @@ void ComputeNewVelocities(Grid* grid)
             ((1.0 / dx) * (grid->GetCellWU(i - 1, j, k) - grid->GetCellWU(i, j, k))) +
                 ((1.0 / dy) * (grid->GetCellVW(i, j - 1, k) - grid->GetCellVW(i, j, k))) +
                 ((1.0 / dz) * (pow(grid->GetCellAverageW(i, j, k), 2) - pow(grid->GetCellAverageW(i, j, k + 1), 2))) +
-                (gravity[2] * emptyGrav) +
+                (gravity.W * emptyGrav) +
                 ((1.0 / dz) * (grid->GetCellPressure(i, j, k) - grid->GetCellPressure(i, j, k + 1))) +
                 (v_dx2 * (grid->GetCellW(i + 1, j, k) - 2 * grid->GetCellW(i, j, k) + grid->GetCellW(i - 1, j, k))) +
                 (v_dy2 * (grid->GetCellW(i, j + 1, k) - 2 * grid->GetCellW(i, j, k) + grid->GetCellW(i, j - 1, k))) +
@@ -294,6 +294,9 @@ void UpdateCellsWithParticles(Grid* grid)
 
         if (cell->Type != Solid)
             cell->Type = isFull ? Full : Empty;
+
+        if (cell->Type == Empty)
+            cell->Pressure = 100.0;
 
         // If cell was deemed full, determine if it is a surface
         if (cell->Type != Full)
