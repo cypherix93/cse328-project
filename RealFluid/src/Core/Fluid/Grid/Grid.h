@@ -52,7 +52,7 @@ class Grid
     bool IsBoundaryV(int i, int j, int k) { if (i >= 0 && i < CellsX && j >= 0 && j < CellsY - 1 && k >= 0 && k < CellsZ) return false; return true; }
     bool IsBoundaryW(int i, int j, int k) { if (i >= 0 && i < CellsX && j >= 0 && j < CellsY && k >= 0 && k < CellsZ - 1) return false; return true; }
 
-    float getPressure(int i, int j, int k) { if (IsBoundaryU(i, j, k)) return 0; return GetCellAtIndex(i, j, k)->Pressure; }
+    float GetCellPressure(int i, int j, int k) { if (IsBoundaryU(i, j, k)) return 0; return GetCellAtIndex(i, j, k)->Pressure; }
 
 
     private:

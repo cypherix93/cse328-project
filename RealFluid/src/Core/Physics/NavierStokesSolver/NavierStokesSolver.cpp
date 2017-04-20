@@ -12,19 +12,27 @@ auto particlesAdded = 0;
 /* Public */
 void ProcessGrid(Grid* grid)
 {
-    if (particlesAdded < 40)
+    if (particlesAdded < 120)
     {
         particlesAdded++;
 
         if (particlesAdded % 4 == 0)
             AddParticles(grid);
     }
+
+    // Update cell types based on particles
     UpdateCellsWithParticles(grid);
 
+    // Adjust boundary conditions for solid / surface cells
     AdjustBoundaryConditions(grid);
-    UpdateNewVelocities(grid);
-    //AdjustForIncompressibility(grid);
 
+    // Update velocities for cells
+    UpdateNewVelocities(grid);
+
+    // Pressure iteration
+    AdjustForIncompressibility(grid);
+
+    // Update position of particles
     MoveParticles(grid);
 }
 
@@ -87,7 +95,7 @@ void ComputeNewVelocities(Grid* grid)
                 ((1.0 / dy) * (grid->GetCellUV(i, j - 1, k) - grid->GetCellUV(i, j, k))) +
                 ((1.0 / dz) * (grid->GetCellWU(i, j, k - 1) - grid->GetCellWU(i, j, k))) +
                 (gravity[0] * emptyGrav) +
-                ((1.0 / dx) * (grid->getPressure(i, j, k) - grid->getPressure(i + 1, j, k))) +
+                ((1.0 / dx) * (grid->GetCellPressure(i, j, k) - grid->GetCellPressure(i + 1, j, k))) +
                 (v_dx2 * (grid->GetCellU(i + 1, j, k) - (2 * grid->GetCellU(i, j, k)) + grid->GetCellU(i - 1, j, k))) +
                 (v_dy2 * (grid->GetCellU(i, j + 1, k) - (2 * grid->GetCellU(i, j, k)) + grid->GetCellU(i, j - 1, k))) +
                 (v_dz2 * (grid->GetCellU(i, j, k + 1) - (2 * grid->GetCellU(i, j, k)) + grid->GetCellU(i, j, k - 1)))
@@ -101,7 +109,7 @@ void ComputeNewVelocities(Grid* grid)
                 ((1.0 / dy) * (pow(grid->GetCellAverageV(i, j, k), 2) - pow(grid->GetCellAverageV(i, j + 1, k), 2))) +
                 ((1.0 / dz) * (grid->GetCellVW(i, j, k - 1) - grid->GetCellVW(i, j, k))) +
                 (gravity[1] * emptyGrav) +
-                ((1.0 / dy) * (grid->getPressure(i, j, k) - grid->getPressure(i, j + 1, k))) +
+                ((1.0 / dy) * (grid->GetCellPressure(i, j, k) - grid->GetCellPressure(i, j + 1, k))) +
                 (v_dx2 * (grid->GetCellV(i + 1, j, k) - 2 * grid->GetCellV(i, j, k) + grid->GetCellV(i - 1, j, k))) +
                 (v_dy2 * (grid->GetCellV(i, j + 1, k) - 2 * grid->GetCellV(i, j, k) + grid->GetCellV(i, j - 1, k))) +
                 (v_dz2 * (grid->GetCellV(i, j, k + 1) - 2 * grid->GetCellV(i, j, k) + grid->GetCellV(i, j, k - 1)))
@@ -115,22 +123,22 @@ void ComputeNewVelocities(Grid* grid)
                 ((1.0 / dy) * (grid->GetCellVW(i, j - 1, k) - grid->GetCellVW(i, j, k))) +
                 ((1.0 / dz) * (pow(grid->GetCellAverageW(i, j, k), 2) - pow(grid->GetCellAverageW(i, j, k + 1), 2))) +
                 (gravity[2] * emptyGrav) +
-                ((1.0 / dz) * (grid->getPressure(i, j, k) - grid->getPressure(i, j, k + 1))) +
+                ((1.0 / dz) * (grid->GetCellPressure(i, j, k) - grid->GetCellPressure(i, j, k + 1))) +
                 (v_dx2 * (grid->GetCellW(i + 1, j, k) - 2 * grid->GetCellW(i, j, k) + grid->GetCellW(i - 1, j, k))) +
                 (v_dy2 * (grid->GetCellW(i, j + 1, k) - 2 * grid->GetCellW(i, j, k) + grid->GetCellW(i, j - 1, k))) +
                 (v_dz2 * (grid->GetCellW(i, j, k + 1) - 2 * grid->GetCellW(i, j, k) + grid->GetCellW(i, j, k - 1)))
                 );
 
         // Update the values into the buffer to later replace the grid with
-        struct UpdatedCellVector newVector;
-        newVector.I = i;
-        newVector.J = j;
-        newVector.K = k;
-        newVector.U = new_u;
-        newVector.V = new_v;
-        newVector.W = new_w;
+        struct UpdatedCellValues newValues;
+        newValues.I = i;
+        newValues.J = j;
+        newValues.K = k;
+        newValues.U = new_u;
+        newValues.V = new_v;
+        newValues.W = new_w;
 
-        UpdatedCellVectorBuffer.push_back(newVector);
+        UpdatedCellVectorBuffer.push_back(newValues);
     }
 }
 
@@ -158,6 +166,9 @@ void AdjustForIncompressibility(Grid* grid)
     dy2 = pow(dy, 2);
     dz2 = pow(dz, 2);
 
+    float betaDenom = (2.0 * dt) * ((1.0 / dx2) + (1.0 / dy2) + (1.0 / dz2));
+    float B = BETA_0 / betaDenom;
+
     auto cells = *(grid->GetCellsVector());
 
     for (auto iters = 0; iters < 3; iters++)
@@ -167,13 +178,14 @@ void AdjustForIncompressibility(Grid* grid)
         {
             auto cell = cells[c];
 
+            if (cell->Boundary == Inflow)
+                continue;
+
             int i, j, k;
             float du, dv, dw;
 
             float Dx, Dy, Dz;
-            float betaDenom;
-
-            float D, B, dp;
+            float D, dp;
 
             auto index = grid->GetCellIndex(cell->X, cell->Y, cell->Z);
             i = index[0];
@@ -187,11 +199,6 @@ void AdjustForIncompressibility(Grid* grid)
 
             D = -(Dx + Dy + Dz);
 
-            // Beta
-            betaDenom = (2.0 * dt) * ((1.0 / dx2) + (1.0 / dy2) + (1.0 / dz2));
-
-            B = BETA_0 / betaDenom;
-
             // Pressure
             dp = B * D;
 
@@ -200,26 +207,45 @@ void AdjustForIncompressibility(Grid* grid)
             dv = (dt / dy) * dp;
             dw = (dt / dz) * dp;
 
-            // Update this cell
-            cell->U += du;
-            cell->V += dv;
-            cell->W += dw;
-
-            // Update next cells 
+            /*
+            // Update next cells
             auto prev_x = grid->GetCellAtIndex(i - 1, j, k);
             auto prev_y = grid->GetCellAtIndex(i, j - 1, k);
             auto prev_z = grid->GetCellAtIndex(i, j, k - 1);
-
             if (prev_x != nullptr)
                 prev_x->U -= du;
             if (prev_y != nullptr)
                 prev_y->V -= dv;
             if (prev_z != nullptr)
                 prev_z->W -= dw;
+            //*/
 
-            // Update this cell's pressure
-            cell->Pressure += dp;
+
+            struct UpdatedCellValues newValues;
+            newValues.I = i;
+            newValues.J = j;
+            newValues.K = k;
+            newValues.U = cell->U + du;
+            newValues.V = cell->V + dv;
+            newValues.W = cell->W + dw;
+            newValues.Pressure = cell->Pressure + dp;
+
+            UpdatedCellVectorBuffer.push_back(newValues);
         }
+
+        #pragma omp parallel for
+        for (auto c = 0; c < UpdatedCellVectorBuffer.size(); c++)
+        {
+            auto update = UpdatedCellVectorBuffer[c];
+
+            auto cell = grid->GetCellAtIndex(update.I, update.J, update.K);
+            cell->U = update.U;
+            cell->V = update.V;
+            cell->W = update.W;
+            cell->Pressure = update.Pressure;
+        }
+
+        UpdatedCellVectorBuffer.clear();
     }
 }
 

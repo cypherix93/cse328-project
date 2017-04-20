@@ -4,7 +4,7 @@
 #define EPSILON 0.0001
 #define BETA_0 1.7
 
-struct UpdatedCellVector
+struct UpdatedCellValues
 {
     int I;
     int J;
@@ -13,13 +13,15 @@ struct UpdatedCellVector
     float U;
     float V;
     float W;
+    
+    float Pressure;
 };
 
 /* Public */
 void ProcessGrid(Grid* grid);
 
 /* Private */
-static vector<UpdatedCellVector> UpdatedCellVectorBuffer;
+static vector<UpdatedCellValues> UpdatedCellVectorBuffer;
 
 static void UpdateNewVelocities(Grid* grid);
 static void ComputeNewVelocities(Grid* grid);
