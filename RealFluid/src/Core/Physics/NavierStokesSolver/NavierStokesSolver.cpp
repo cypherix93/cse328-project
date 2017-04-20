@@ -33,8 +33,7 @@ void UpdateNewVelocities(Grid* grid)
     ComputeNewVelocities(grid);
 
     #pragma omp parallel for
-    for (auto c = 0; c < UpdatedCellVectorBuffer.size();
-        c++)
+    for (auto c = 0; c < UpdatedCellVectorBuffer.size(); c++)
     {
         auto update = UpdatedCellVectorBuffer[c];
 
@@ -305,13 +304,13 @@ void MoveParticles(Grid* grid)
 {
     auto particles = *(grid->GetParticlesVector());
 
-    #pragma omp parallel for
+//    #pragma omp parallel for
     for (auto p = 0; p < particles.size(); p++)
     {
         auto particle = particles[p];
 
         auto velocity = Helpers::ComputeParticleVelocity(grid, particle);
 
-        particle->MoveBy(velocity.U, velocity.V, velocity.W);
+        particle->MoveBy(dt * velocity.U, dt * velocity.V, dt * velocity.W);
     }
 }

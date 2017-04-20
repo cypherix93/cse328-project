@@ -18,15 +18,14 @@ Velocity Helpers::ComputeParticleVelocity(Grid* grid, Particle* particle)
     auto py = particle->Y;
     auto pz = particle->Z;
 
-    auto dx_2 = dim / 2;
-    auto dy_2 = dim / 2;
-    auto dz_2 = dim / 2;
+    auto dim_2 = dim / 2;
+    auto dim_sq = pow(dim, 2);
 
     vector<Coordinate> particleBounds = {
-        Coordinate(px - dx_2, py + dy_2), // top left
-        Coordinate(px + dx_2, py + dy_2), // top right
-        Coordinate(px + dx_2, py - dy_2), // bottom right
-        Coordinate(px - dx_2, py - dy_2) // bottom left
+        Coordinate(px - dim_2, py + dim_2), // top left
+        Coordinate(px + dim_2, py + dim_2), // top right
+        Coordinate(px + dim_2, py - dim_2), // bottom right
+        Coordinate(px - dim_2, py - dim_2) // bottom left
     };
 
     vector<FluidCell*> neighborCells = {
@@ -40,31 +39,31 @@ Velocity Helpers::ComputeParticleVelocity(Grid* grid, Particle* particle)
     Coordinate pbrk;
     float a1, a2, a3, a4;
 
-    if (neighborCells[2] != nullptr)
+    if (neighborCells[1] != nullptr)
     {
-        pbrk = neighborCells[2]->GetCoordinates();
+        pbrk = neighborCells[1]->GetCoordinates();
     }
     else if (neighborCells[0] != nullptr)
     {
         pbrk = neighborCells[0]->GetCoordinates();
         pbrk.X += dim;
-        pbrk.Y -= dim;
     }
-    else if (neighborCells[1] != nullptr)
+    else if (neighborCells[2] != nullptr)
     {
-        pbrk = neighborCells[1]->GetCoordinates();
-        pbrk.Y -= dim;
+        pbrk = neighborCells[2]->GetCoordinates();
+        pbrk.Y += dim;
     }
     else if (neighborCells[3] != nullptr)
     {
         pbrk = neighborCells[3]->GetCoordinates();
         pbrk.X += dim;
+        pbrk.Y += dim;
     }
 
-    a1 = abs(pbrk.X - particleBounds[0].X) * abs(pbrk.Y - particleBounds[0].Y);
-    a2 = abs(pbrk.X - particleBounds[1].X) * abs(pbrk.Y - particleBounds[1].Y);
-    a3 = abs(pbrk.X - particleBounds[2].X) * abs(pbrk.Y - particleBounds[2].Y);
-    a4 = abs(pbrk.X - particleBounds[3].X) * abs(pbrk.Y - particleBounds[3].Y);
+    a1 = abs(pbrk.X - particleBounds[0].X) * abs(pbrk.Y - particleBounds[0].Y) / dim_sq;
+    a2 = abs(pbrk.X - particleBounds[1].X) * abs(pbrk.Y - particleBounds[1].Y) / dim_sq;
+    a3 = abs(pbrk.X - particleBounds[2].X) * abs(pbrk.Y - particleBounds[2].Y) / dim_sq;
+    a4 = abs(pbrk.X - particleBounds[3].X) * abs(pbrk.Y - particleBounds[3].Y) / dim_sq;
 
     // Compute U
     u = (neighborCells[0] == nullptr ? 0 : (a1 * neighborCells[0]->U)) +

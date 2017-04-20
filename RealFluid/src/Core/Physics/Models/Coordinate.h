@@ -5,7 +5,7 @@ class Coordinate
     public:
     int X, Y, Z;
 
-    explicit Coordinate(int x = 1, int y = 1, int z = 1)
+    explicit Coordinate(int x = 0, int y = 0, int z = 0)
     {
         X = x;
         Y = y;
