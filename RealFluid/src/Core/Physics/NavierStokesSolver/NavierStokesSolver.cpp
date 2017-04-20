@@ -27,7 +27,7 @@ void ProcessGrid(Grid* grid)
     AdjustBoundaryConditions(grid);
 
     // Update velocities for cells
-    UpdateNewVelocities(grid);
+    ComputeNewVelocities(grid);
 
     // Pressure iteration
     AdjustForIncompressibility(grid);
@@ -36,22 +36,21 @@ void ProcessGrid(Grid* grid)
     MoveParticles(grid);
 }
 
-void UpdateNewVelocities(Grid* grid)
+void UpdateCellValues(Grid* grid)
 {
-    ComputeNewVelocities(grid);
-
     #pragma omp parallel for
-    for (auto c = 0; c < UpdatedCellVectorBuffer.size(); c++)
+    for (auto c = 0; c < UpdatedCellValuesBuffer.size(); c++)
     {
-        auto update = UpdatedCellVectorBuffer[c];
+        auto update = UpdatedCellValuesBuffer[c];
 
         auto cell = grid->GetCellAtIndex(update.I, update.J, update.K);
         cell->U = update.U;
         cell->V = update.V;
         cell->W = update.W;
+        cell->Pressure = update.Pressure;
     }
 
-    UpdatedCellVectorBuffer.clear();
+    UpdatedCellValuesBuffer.clear();
 }
 
 void ComputeNewVelocities(Grid* grid)
@@ -85,7 +84,7 @@ void ComputeNewVelocities(Grid* grid)
         j = index[1];
         k = index[2];
 
-        auto emptyGrav = cell->Type == Empty ? 0.0 : 1.0;
+        auto emptyGrav = cell->Type == Empty ? 1.0 : 1.0;
 
         float new_u =
             grid->GetCellU(i, j, k) +
@@ -137,9 +136,13 @@ void ComputeNewVelocities(Grid* grid)
         newValues.U = new_u;
         newValues.V = new_v;
         newValues.W = new_w;
+        newValues.Pressure = cell->Pressure;
 
-        UpdatedCellVectorBuffer.push_back(newValues);
+        UpdatedCellValuesBuffer.push_back(newValues);
     }
+
+    // Apply the changes
+    UpdateCellValues(grid);
 }
 
 /* Private */
@@ -152,8 +155,57 @@ void AdjustBoundaryConditions(Grid* grid)
     {
         auto cell = cells[c];
 
-        Helpers::AdjustSolidCellConditions(grid, cell);
+        if (cell->Type != Solid)
+            continue;
+
+        int i, j, k;
+        auto index = grid->GetCellIndex(cell->X, cell->Y, cell->Z);
+        i = index[0];
+        j = index[1];
+        k = index[2];
+
+        auto t = grid->GetCellAtIndex(i, j + 1, k);
+        auto r = grid->GetCellAtIndex(i + 1, j, k);
+        auto l = grid->GetCellAtIndex(i - 1, j, k);
+
+        float totalPressure = 0.0;
+        float totalU = 0.0;
+        float totalV = 0.0;
+
+        if (t != nullptr && t->Type != Solid)
+        {
+            totalPressure += t->Pressure;
+            totalU += -(t->U);
+        }
+        if (l != nullptr && l->Type != Solid)
+        {
+            totalV += -(l->V);
+        }
+        if (r != nullptr && r->Type != Solid)
+        {
+            totalV += -(r->V);
+        }
+
+        cell->U = totalU;
+        cell->V = totalV;
+        cell->W = 0.0;
+
+        cell->Pressure = totalPressure;
+
+        struct UpdatedCellValues newValues;
+        newValues.I = i;
+        newValues.J = j;
+        newValues.K = k;
+        newValues.U = totalU;
+        newValues.V = totalV;
+        newValues.W = 0.0;
+        newValues.Pressure = totalPressure;
+
+        UpdatedCellValuesBuffer.push_back(newValues);
     }
+
+    // Apply the changes
+    UpdateCellValues(grid);
 }
 
 void AdjustForIncompressibility(Grid* grid)
@@ -230,22 +282,11 @@ void AdjustForIncompressibility(Grid* grid)
             newValues.W = cell->W + dw;
             newValues.Pressure = cell->Pressure + dp;
 
-            UpdatedCellVectorBuffer.push_back(newValues);
+            UpdatedCellValuesBuffer.push_back(newValues);
         }
 
-        #pragma omp parallel for
-        for (auto c = 0; c < UpdatedCellVectorBuffer.size(); c++)
-        {
-            auto update = UpdatedCellVectorBuffer[c];
-
-            auto cell = grid->GetCellAtIndex(update.I, update.J, update.K);
-            cell->U = update.U;
-            cell->V = update.V;
-            cell->W = update.W;
-            cell->Pressure = update.Pressure;
-        }
-
-        UpdatedCellVectorBuffer.clear();
+        // Apply the changes
+        UpdateCellValues(grid);
     }
 }
 

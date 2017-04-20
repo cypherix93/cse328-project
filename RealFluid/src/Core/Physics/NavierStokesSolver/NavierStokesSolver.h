@@ -21,9 +21,9 @@ struct UpdatedCellValues
 void ProcessGrid(Grid* grid);
 
 /* Private */
-static vector<UpdatedCellValues> UpdatedCellVectorBuffer;
+static vector<UpdatedCellValues> UpdatedCellValuesBuffer;
+static void UpdateCellValues(Grid* grid);
 
-static void UpdateNewVelocities(Grid* grid);
 static void ComputeNewVelocities(Grid* grid);
 
 static void AdjustBoundaryConditions(Grid* grid);
