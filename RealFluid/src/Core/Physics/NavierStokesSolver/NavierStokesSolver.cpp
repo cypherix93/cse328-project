@@ -4,7 +4,7 @@
 #include <Core/Helpers/GridHelper/GridHelper.h>
 
 auto dt = 1.0 / 20.0;
-auto viscosity = 0.0001;
+auto viscosity = 0.1;
 Velocity gravity{ 0.0f, -9.8f, 0.0f };
 
 auto particlesAdded = 0;
@@ -223,7 +223,7 @@ void AdjustForIncompressibility(Grid* grid)
 
     auto cells = *(grid->GetCellsVector());
 
-    for (auto iters = 0; iters < 3; iters++)
+    for (auto iters = 0; iters < 6; iters++)
     {
         #pragma omp parallel for
         for (auto c = 0; c < cells.size(); c++)
@@ -280,7 +280,7 @@ void AdjustForIncompressibility(Grid* grid)
             newValues.U = cell->U + du;
             newValues.V = cell->V + dv;
             newValues.W = cell->W + dw;
-            newValues.Pressure = cell->Pressure + dp;
+            newValues.Pressure = cell->Pressure;
 
             UpdatedCellValuesBuffer.push_back(newValues);
         }
