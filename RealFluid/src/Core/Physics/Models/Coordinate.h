@@ -3,9 +3,9 @@
 class Coordinate
 {
     public:
-    int X, Y, Z;
+    float X, Y, Z;
 
-    explicit Coordinate(int x = 0, int y = 0, int z = 0)
+    explicit Coordinate(float x = 0.0, float y = 0.0, float z = 0.0)
     {
         X = x;
         Y = y;

@@ -79,10 +79,9 @@ void ComputeNewVelocities(Grid* grid)
             continue;
 
         int i, j, k;
-        auto index = grid->GetCellIndex(cell->X, cell->Y, cell->Z);
-        i = index[0];
-        j = index[1];
-        k = index[2];
+        i = cell->X;
+        j = cell->Y;
+        k = cell->Z;
 
         auto emptyGrav = cell->Type == Empty ? 1.0 : 1.0;
 
@@ -159,10 +158,9 @@ void AdjustBoundaryConditions(Grid* grid)
             continue;
 
         int i, j, k;
-        auto index = grid->GetCellIndex(cell->X, cell->Y, cell->Z);
-        i = index[0];
-        j = index[1];
-        k = index[2];
+        i = cell->X;
+        j = cell->Y;
+        k = cell->Z;
 
         auto t = grid->GetCellAtIndex(i, j + 1, k);
         auto r = grid->GetCellAtIndex(i + 1, j, k);
@@ -239,10 +237,9 @@ void AdjustForIncompressibility(Grid* grid)
             float Dx, Dy, Dz;
             float D, dp;
 
-            auto index = grid->GetCellIndex(cell->X, cell->Y, cell->Z);
-            i = index[0];
-            j = index[1];
-            k = index[2];
+            i = cell->X;
+            j = cell->Y;
+            k = cell->Z;
 
             // Divergence
             Dx = (1.0 / dx) * (grid->GetCellU(i, j, k) - grid->GetCellU(i - 1, j, k));
@@ -325,7 +322,7 @@ void UpdateCellsWithParticles(Grid* grid)
         {
             auto particle = particles[p];
 
-            auto particleCell = grid->GetCellAtPixel(particle->X, particle->Y, particle->Z);
+            auto particleCell = grid->GetCellAtCoordinate(Coordinate{ particle->X, particle->Y, particle->Z });
 
             if (particleCell == cell)
                 isFull = true;

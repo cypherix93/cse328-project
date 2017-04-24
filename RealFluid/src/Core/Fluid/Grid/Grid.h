@@ -20,6 +20,7 @@ class Grid
 
     // Cell Operations
     FluidCell* GetCellAtIndex(int i, int j, int k);
+    FluidCell* GetCellAtCoordinate(Coordinate coord);
     
     void AddParticle(FluidCell* cell);
 

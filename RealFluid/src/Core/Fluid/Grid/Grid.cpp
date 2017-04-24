@@ -84,9 +84,14 @@ FluidCell* Grid::GetCellAtIndex(int i, int j, int k)
     return CellsMap[Helpers::GetCellKey(i, j, k)];
 }
 
+FluidCell* Grid::GetCellAtCoordinate(Coordinate coord)
+{
+    return GetCellAtIndex(coord.X, coord.Y, coord.Z);
+}
+
 void Grid::AddParticle(FluidCell* cell)
 {
-    int x, y, z;
+    float x, y, z;
     x = cell->X + 0.5f;
     y = cell->Y + 0.5f;
     z = cell->Z;

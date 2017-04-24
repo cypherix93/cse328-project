@@ -3,10 +3,10 @@
 class Particle
 {
     public:
-    Particle(int x, int y, int z);
+    Particle(float x, float y, float z);
     virtual ~Particle();
 
-    int X, Y, Z;
+    float X, Y, Z;
 
     void MoveBy(float u, float v, float w);
 };
