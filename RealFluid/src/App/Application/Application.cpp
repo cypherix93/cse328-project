@@ -12,6 +12,11 @@ Application::~Application()
     free(_WindowManager);
 }
 
+WindowManager* Application::GetWindowManager() const
+{
+    return _WindowManager;
+}
+
 /* Public Methods*/
 void Application::Setup()
 {
@@ -37,3 +42,4 @@ void Application::Start()
     // Start Window Lifecycle
     _WindowManager->Start(60);
 }
+

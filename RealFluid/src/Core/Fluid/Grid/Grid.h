@@ -10,8 +10,10 @@ using namespace std;
 class Grid
 {
     public:
-    Grid(int width, int height, int cellDimensions);
+    Grid(int xCells, int yCells, int zCells);
     virtual ~Grid();
+
+    int CellsX, CellsY, CellsZ;
 
     // Grid Operations
     map<string, FluidCell*>* GetCellsMap();
@@ -49,8 +51,6 @@ class Grid
     vector<FluidCell*> CellsVector;
 
     vector<Particle*> ParticlesVector;
-
-    int CellsX, CellsY, CellsZ;
 
     void ConstructGrid();
     void DestructGrid();

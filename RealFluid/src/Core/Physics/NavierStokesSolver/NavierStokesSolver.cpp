@@ -4,8 +4,8 @@
 #include <Core/Helpers/GridHelper/GridHelper.h>
 
 auto dt = 1.0 / 20.0;
-auto viscosity = 0.1;
-Velocity gravity{ 0.0f, -9.8f, 0.0f };
+auto viscosity = 0.0001;
+Velocity gravity{ 0.0f, -0.98f, 0.0f };
 
 auto particlesAdded = 0;
 
