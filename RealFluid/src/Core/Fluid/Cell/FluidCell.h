@@ -31,17 +31,13 @@ class FluidCell
     BoundaryType Boundary;
 
     int X, Y, Z;
-    int Width, Height, Depth;
+
+    float Width = 1.0f, Height = 1.0f, Depth = 1.0f;
 
     float U, V, W;
     float Pressure;
 
     // Getters
     Coordinate GetCoordinates() const;
-
-    // Drawers
-    void DrawContents() const;
-    void DrawOutline() const;
-    void DrawVectors() const;
 };
 

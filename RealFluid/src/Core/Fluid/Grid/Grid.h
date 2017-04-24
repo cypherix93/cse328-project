@@ -14,19 +14,13 @@ class Grid
     virtual ~Grid();
 
     // Grid Operations
-    int GetCellDimensions();
-
     map<string, FluidCell*>* GetCellsMap();
     vector<FluidCell*>* GetCellsVector();
     vector<Particle*>* GetParticlesVector();
 
     // Cell Operations
     FluidCell* GetCellAtIndex(int i, int j, int k);
-    FluidCell* GetCellAtPixel(int x, int y, int z);
-    FluidCell* GetCellAtCoordinate(Coordinate coord);
-
-    vector<int> GetCellIndex(int x, int y, int z);
-
+    
     void AddParticle(FluidCell* cell);
 
 
@@ -55,9 +49,7 @@ class Grid
 
     vector<Particle*> ParticlesVector;
 
-    int Width, Height;
     int CellsX, CellsY, CellsZ;
-    int CellDimensions;
 
     void ConstructGrid();
     void DestructGrid();

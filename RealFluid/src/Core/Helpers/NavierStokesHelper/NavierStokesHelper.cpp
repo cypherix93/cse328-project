@@ -6,10 +6,9 @@ void Helpers::AdjustSolidCellConditions(Grid* grid, FluidCell* cell)
         return;
 
     int i, j, k;
-    auto index = grid->GetCellIndex(cell->X, cell->Y, cell->Z);
-    i = index[0];
-    j = index[1];
-    k = index[2];
+    i = cell->X;
+    j = cell->Y;
+    k = cell->Z;
 
     auto t = grid->GetCellAtIndex(i, j + 1, k);
     auto r = grid->GetCellAtIndex(i + 1, j, k);

@@ -12,7 +12,7 @@ Velocity Helpers::ComputeParticleVelocity(Grid* grid, Particle* particle)
 {
     float u, v;
 
-    auto dim = grid->GetCellDimensions();
+    auto dim = 1.0f;
 
     auto px = particle->X;
     auto py = particle->Y;

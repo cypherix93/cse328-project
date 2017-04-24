@@ -60,7 +60,7 @@ void ComputeNewVelocities(Grid* grid)
     double dx, dy, dz;
     double dx2, dy2, dz2;
 
-    dx = dy = dz = grid->GetCellDimensions();
+    dx = dy = dz = 1.0f;
     dx2 = pow(dx, 2);
     dy2 = pow(dy, 2);
     dz2 = pow(dz, 2);
@@ -210,10 +210,10 @@ void AdjustBoundaryConditions(Grid* grid)
 
 void AdjustForIncompressibility(Grid* grid)
 {
-    double dx, dy, dz;
-    double dx2, dy2, dz2;
+    float dx, dy, dz;
+    float dx2, dy2, dz2;
 
-    dx = dy = dz = grid->GetCellDimensions();
+    dx = dy = dz = 1.0f;
     dx2 = pow(dx, 2);
     dy2 = pow(dy, 2);
     dz2 = pow(dz, 2);
@@ -280,7 +280,7 @@ void AdjustForIncompressibility(Grid* grid)
             newValues.U = cell->U + du;
             newValues.V = cell->V + dv;
             newValues.W = cell->W + dw;
-            newValues.Pressure = cell->Pressure;
+            newValues.Pressure = cell->Pressure + dp;
 
             UpdatedCellValuesBuffer.push_back(newValues);
         }
@@ -312,8 +312,6 @@ void UpdateCellsWithParticles(Grid* grid)
 
     auto cells = *(grid->GetCellsVector());
 
-    int i, j, k;
-
     #pragma omp parallel for
     for (auto c = 0; c < cells.size(); c++)
     {
@@ -343,10 +341,10 @@ void UpdateCellsWithParticles(Grid* grid)
         if (cell->Type != Full)
             continue;
 
-        auto index = grid->GetCellIndex(cell->X, cell->Y, cell->Z);
-        i = index[0];
-        j = index[1];
-        k = index[2];
+        int i, j, k;
+        i = cell->X;
+        j = cell->Y;
+        k = cell->Z;
 
         auto neighbors = {
             grid->GetCellAtIndex(i, j + 1, k),
