@@ -39,11 +39,11 @@ void DrawCellGrid(Grid* grid, GridDrawOptions* options)
 
 void DrawCell(FluidCell* cell, GridDrawOptions* options)
 {
-    if (options->DrawCellVectors)
-        DrawCellVectors(cell, options);
-
     if (options->DrawCellOutline)
         DrawCellOutline(cell, options);
+
+    if (options->DrawCellVectors)
+        DrawCellVectors(cell, options);
 
     if (options->DrawCellContents)
         DrawCellContents(cell, options);
@@ -73,19 +73,19 @@ void DrawCellContents(FluidCell* cell, GridDrawOptions* options)
 
     glBegin(GL_POLYGON);
 
-    glVertex3i(x, y, z);
+    glVertex3f(x, y, z);
 
     x += options->CellDimensions;
-    glVertex3i(x, y, z);
+    glVertex3f(x, y, z);
 
     y += options->CellDimensions;
-    glVertex3i(x, y, z);
+    glVertex3f(x, y, z);
 
     x -= options->CellDimensions;
-    glVertex3i(x, y, z);
+    glVertex3f(x, y, z);
 
     y -= options->CellDimensions;
-    glVertex3i(x, y, z);
+    glVertex3f(x, y, z);
 
     glEnd();
 }
@@ -99,19 +99,19 @@ void DrawCellOutline(FluidCell* cell, GridDrawOptions* options)
     glColor4f(1.0f, 1.0f, 1.0f, 0.2f);
     glBegin(GL_LINE_LOOP);
 
-    glVertex3i(x, y, z);
+    glVertex3f(x, y, z);
 
-    x += cell->Width;
-    glVertex3i(x, y, z);
+    x += options->CellDimensions;
+    glVertex3f(x, y, z);
 
     y += options->CellDimensions;
-    glVertex3i(x, y, z);
+    glVertex3f(x, y, z);
 
     x -= options->CellDimensions;
-    glVertex3i(x, y, z);
+    glVertex3f(x, y, z);
 
     y -= options->CellDimensions;
-    glVertex3i(x, y, z);
+    glVertex3f(x, y, z);
 
     glEnd();
 }
@@ -120,18 +120,18 @@ void DrawCellVectors(FluidCell* cell, GridDrawOptions* options)
 {
     auto x = (cell->X * options->CellDimensions) + (options->CellDimensions / 2);
     auto y = (cell->Y * options->CellDimensions) + (options->CellDimensions / 2);
-    auto z = 0;
+    auto z = 0.0f;
 
     glColor4f(1.0f, 0.0f, 0.0f, 1.0f);
 
     glBegin(GL_LINES);
 
-    glVertex3i(x, y, z);
+    glVertex3f(x, y, z);
 
     x += cell->U * options->CellDimensions;
     y += cell->V * options->CellDimensions;
     z += cell->W * options->CellDimensions;
-    glVertex3i(x, y, z);
+    glVertex3f(x, y, z);
 
     glEnd();
 }
@@ -143,7 +143,7 @@ void DrawParticle(Particle* particle, GridDrawOptions* options)
 
     glBegin(GL_POINTS);
 
-    glVertex3i(
+    glVertex3f(
         particle->X * options->CellDimensions,
         particle->Y * options->CellDimensions,
         particle->Z * options->CellDimensions
