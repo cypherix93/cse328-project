@@ -30,7 +30,7 @@ class FluidCell
     FluidCellType Type;
     BoundaryType Boundary;
 
-    float X, Y, Z;
+    float I, J, K;
 
     float Width = 1.0f, Height = 1.0f, Depth = 1.0f;
 

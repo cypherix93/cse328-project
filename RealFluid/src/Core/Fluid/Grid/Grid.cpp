@@ -38,9 +38,9 @@ void Grid::ConstructGrid()
         for (auto j = 0; j < CellsY; j++)
         {
             auto cell = new FluidCell();
-            cell->X = i;
-            cell->Y = j;
-            cell->Z = 0;
+            cell->I = i;
+            cell->J = j;
+            cell->K = 0;
 
             if (j < 2 || (i < 1 && j < CellsY - 3) || (i > CellsX - 2 && j < CellsY - 3))
             {
@@ -59,7 +59,7 @@ void Grid::ConstructGrid()
 
     for (auto cell : CellsVector)
     {
-        CellsMap[Helpers::GetCellKey(cell->X, cell->Y, cell->Z)] = cell;
+        CellsMap[Helpers::GetCellKey(cell->I, cell->J, cell->K)] = cell;
     }
 }
 
@@ -92,9 +92,9 @@ FluidCell* Grid::GetCellAtCoordinate(Coordinate coord)
 void Grid::AddParticle(FluidCell* cell)
 {
     float x, y, z;
-    x = cell->X + 0.5f;
-    y = cell->Y + 0.5f;
-    z = cell->Z;
+    x = cell->I + 0.5f;
+    y = cell->J + 0.5f;
+    z = cell->K;
 
     ParticlesVector.push_back(new Particle(x, y, z));
 }

@@ -3,8 +3,8 @@
 #include <Core/Helpers/NavierStokesHelper/NavierStokesHelper.h>
 #include <Core/Helpers/GridHelper/GridHelper.h>
 
-float dt = 1.0f / 20.0f;
-float viscosity = 0.0001f;
+float dt = 1.0f / 120.0f;
+float viscosity = 1.0f;
 Velocity gravity{ 0.0f, -0.98f, 0.0f };
 
 auto particlesAdded = 0;
@@ -25,7 +25,7 @@ void ProcessGrid(Grid* grid)
     ComputeNewVelocities(grid);
 
     // Pressure iteration
-    AdjustForIncompressibility(grid);
+    //AdjustForIncompressibility(grid);
 
     // Update position of particles
     MoveParticles(grid);
@@ -57,11 +57,16 @@ void ComputeNewVelocities(Grid* grid)
             continue;
 
         int i, j, k;
-        i = cell->X;
-        j = cell->Y;
-        k = cell->Z;
+        i = cell->I;
+        j = cell->J;
+        k = cell->K;
 
         float emptyGrav = cell->Type == Empty ? 1.0f : 1.0f;
+
+        if (i == 1 && j == 13)
+        {
+            printf("asdasfa");
+        }
 
         float new_u =
             grid->GetCellU(i, j, k) +
@@ -136,9 +141,9 @@ void AdjustBoundaryConditions(Grid* grid)
             continue;
 
         int i, j, k;
-        i = cell->X;
-        j = cell->Y;
-        k = cell->Z;
+        i = cell->I;
+        j = cell->J;
+        k = cell->K;
 
         auto t = grid->GetCellAtIndex(i, j + 1, k);
         auto r = grid->GetCellAtIndex(i + 1, j, k);
@@ -195,7 +200,9 @@ void AdjustForIncompressibility(Grid* grid)
 
     for (auto iters = 0; iters < 6; iters++)
     {
-        //#pragma omp parallel for
+        auto needsRecompute = false;
+
+        #pragma omp parallel for
         for (auto c = 0; c < cells.size(); c++)
         {
             auto cell = cells[c];
@@ -209,9 +216,9 @@ void AdjustForIncompressibility(Grid* grid)
             float Dx, Dy, Dz;
             float D, dp;
 
-            i = cell->X;
-            j = cell->Y;
-            k = cell->Z;
+            i = cell->I;
+            j = cell->J;
+            k = cell->K;
 
             // Divergence
             Dx = (1.0f / dx) * (grid->GetCellU(i, j, k) - grid->GetCellU(i - 1, j, k));
@@ -219,6 +226,9 @@ void AdjustForIncompressibility(Grid* grid)
             Dz = (1.0f / dz) * (grid->GetCellW(i, j, k) - grid->GetCellW(i, j, k - 1));
 
             D = -(Dx + Dy + Dz);
+
+            if (abs(D) > EPSILON)
+                needsRecompute = true;
 
             // Pressure
             dp = B * D;
@@ -256,6 +266,9 @@ void AdjustForIncompressibility(Grid* grid)
 
         // Apply the changes
         UpdateCellValues(grid);
+
+        if (!needsRecompute)
+            break;
     }
 }
 
@@ -320,9 +333,9 @@ void UpdateCellsWithParticles(Grid* grid)
             continue;
 
         int i, j, k;
-        i = cell->X;
-        j = cell->Y;
-        k = cell->Z;
+        i = cell->I;
+        j = cell->J;
+        k = cell->K;
 
         auto neighbors = {
             grid->GetCellAtIndex(i, j + 1, k),

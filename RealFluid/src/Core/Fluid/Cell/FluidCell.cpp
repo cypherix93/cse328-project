@@ -2,9 +2,9 @@
 
 FluidCell::FluidCell()
 {
-    X = 0;
-    Y = 0;
-    Z = 0;
+    I = 0;
+    J = 0;
+    K = 0;
     
     Pressure = 0.0;
     U = 0.0;
@@ -21,5 +21,5 @@ FluidCell::~FluidCell()
 
 Coordinate FluidCell::GetCoordinates() const
 {
-    return Coordinate(X, Y, Z);
+    return Coordinate(I, J, K);
 }

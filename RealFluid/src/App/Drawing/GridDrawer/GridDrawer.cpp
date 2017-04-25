@@ -51,9 +51,9 @@ void DrawCell(FluidCell* cell, GridDrawOptions* options)
 
 void DrawCellContents(FluidCell* cell, GridDrawOptions* options)
 {
-    auto x = cell->X * options->CellDimensions;
-    auto y = cell->Y * options->CellDimensions;
-    auto z = cell->Z * options->CellDimensions;
+    auto x = cell->I * options->CellDimensions;
+    auto y = cell->J * options->CellDimensions;
+    auto z = cell->K * options->CellDimensions;
 
     if (cell->Type == Empty)
         return;
@@ -92,9 +92,9 @@ void DrawCellContents(FluidCell* cell, GridDrawOptions* options)
 
 void DrawCellOutline(FluidCell* cell, GridDrawOptions* options)
 {
-    auto x = cell->X * options->CellDimensions;
-    auto y = cell->Y * options->CellDimensions;
-    auto z = cell->Z * options->CellDimensions;
+    auto x = cell->I * options->CellDimensions;
+    auto y = cell->J * options->CellDimensions;
+    auto z = cell->K * options->CellDimensions;
 
     glColor4f(1.0f, 1.0f, 1.0f, 0.2f);
     glBegin(GL_LINE_LOOP);
@@ -118,8 +118,8 @@ void DrawCellOutline(FluidCell* cell, GridDrawOptions* options)
 
 void DrawCellVectors(FluidCell* cell, GridDrawOptions* options)
 {
-    auto x = (cell->X * options->CellDimensions) + (options->CellDimensions / 2);
-    auto y = (cell->Y * options->CellDimensions) + (options->CellDimensions / 2);
+    auto x = (cell->I * options->CellDimensions) + (options->CellDimensions / 2);
+    auto y = (cell->J * options->CellDimensions) + (options->CellDimensions / 2);
     auto z = 0.0f;
 
     glColor4f(1.0f, 0.0f, 0.0f, 1.0f);

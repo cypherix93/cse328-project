@@ -12,7 +12,7 @@ void InitHandler()
     glEnable(GL_POINT_SMOOTH);
     glShadeModel(GL_SMOOTH);
 
-    CELL_GRID = new Grid{ 16, 16, 0 };
+    CELL_GRID = new Grid{ 16, 16, 1 };
 
     CELL_GRID_OPTIONS = new GridDrawOptions();
     CELL_GRID_OPTIONS->CellDimensions = 40;
