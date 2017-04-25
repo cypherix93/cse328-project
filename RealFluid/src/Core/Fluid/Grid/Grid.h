@@ -31,9 +31,9 @@ class Grid
     float GetCellV(int i, int j, int k) { if (IsBoundaryV(i, j, k)) return 0; return GetCellAtIndex(i, j, k)->V; }
     float GetCellW(int i, int j, int k) { if (IsBoundaryW(i, j, k)) return 0; return GetCellAtIndex(i, j, k)->W; }
 
-    float GetCellAverageU(int i, int j, int k) { return (GetCellU(i - 1, j, k) + GetCellU(i, j, k) + GetCellU(i + 1, j, k)) / 3; }
-    float GetCellAverageV(int i, int j, int k) { return (GetCellV(i, j - 1, k) + GetCellV(i, j, k) + GetCellV(i, j + 1, k)) / 3; }
-    float GetCellAverageW(int i, int j, int k) { return (GetCellW(i, j, k - 1) + GetCellW(i, j, k) + GetCellW(i, j, k + 1)) / 3; }
+    float GetCellAverageU(int i, int j, int k) { return (GetCellU(i - 1, j, k) + GetCellU(i, j, k)) * 0.5; }
+    float GetCellAverageV(int i, int j, int k) { return (GetCellV(i, j - 1, k) + GetCellV(i, j, k)) * 0.5; }
+    float GetCellAverageW(int i, int j, int k) { return (GetCellW(i, j, k - 1) + GetCellW(i, j, k)) * 0.5; }
 
     float GetCellUV(int i, int j, int k) { return GetCellAverageU(i, j, k) * GetCellAverageV(i, j, k); }
     float GetCellVW(int i, int j, int k) { return GetCellAverageV(i, j, k) * GetCellAverageW(i, j, k); }

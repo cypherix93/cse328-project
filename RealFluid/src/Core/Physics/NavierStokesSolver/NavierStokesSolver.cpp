@@ -3,8 +3,9 @@
 #include <Core/Helpers/NavierStokesHelper/NavierStokesHelper.h>
 #include <Core/Helpers/GridHelper/GridHelper.h>
 
-float dt = 1.0f / 120.0f;
-float viscosity = 1.0f;
+float dt = 1.0f / 60.0f;
+float viscosity = 0.0001f;
+float atmPressure = 0.01f;
 Velocity gravity{ 0.0f, -0.98f, 0.0f };
 
 auto particlesAdded = 0;
@@ -25,7 +26,7 @@ void ProcessGrid(Grid* grid)
     ComputeNewVelocities(grid);
 
     // Pressure iteration
-    //AdjustForIncompressibility(grid);
+    AdjustForIncompressibility(grid);
 
     // Update position of particles
     MoveParticles(grid);
@@ -104,7 +105,7 @@ void ComputeNewVelocities(Grid* grid)
                 (v_dy2 * (grid->GetCellW(i, j + 1, k) - 2.0f * grid->GetCellW(i, j, k) + grid->GetCellW(i, j - 1, k))) +
                 (v_dz2 * (grid->GetCellW(i, j, k + 1) - 2.0f * grid->GetCellW(i, j, k) + grid->GetCellW(i, j, k - 1)))
                 );
-        
+
         // Update the values into the buffer to later replace the grid with
         struct UpdatedCellValues newValues;
         newValues.I = i;
@@ -114,6 +115,11 @@ void ComputeNewVelocities(Grid* grid)
         newValues.V = new_v;
         newValues.W = new_w;
         newValues.Pressure = cell->Pressure;
+
+        if (i == 15 && j == 13)
+        {
+            printf("asdasd");
+        }
 
         UpdatedCellValuesBuffer.push_back(newValues);
     }
@@ -193,7 +199,7 @@ void AdjustForIncompressibility(Grid* grid)
 
     auto cells = *(grid->GetCellsVector());
 
-    for (auto iters = 0; iters < 6; iters++)
+    for (auto iters = 0; iters < 20; iters++)
     {
         auto needsRecompute = false;
 
@@ -203,6 +209,9 @@ void AdjustForIncompressibility(Grid* grid)
             auto cell = cells[c];
 
             if (cell->Boundary == Inflow)
+                continue;
+
+            if (cell->Type == Solid)
                 continue;
 
             int i, j, k;
@@ -321,7 +330,7 @@ void UpdateCellsWithParticles(Grid* grid)
             cell->Type = isFull ? Full : Empty;
 
         if (cell->Type == Empty)
-            cell->Pressure = 100.0;
+            cell->Pressure = atmPressure;
 
         // If cell was deemed full, determine if it is a surface
         if (cell->Type != Full)
