@@ -5,8 +5,8 @@
 
 float dt = 1.0f / 60.0f;
 float viscosity = 0.0001f;
-float atmPressure = 0.01f;
-Velocity gravity{ 0.0f, -0.98f, 0.0f };
+float atmPressure = 0.00f;
+Velocity gravity{ 0.0f, -0.098f, 0.0f };
 
 auto particlesAdded = 0;
 
@@ -62,7 +62,7 @@ void ComputeNewVelocities(Grid* grid)
         j = cell->J;
         k = cell->K;
 
-        float emptyGrav = cell->Type == Empty ? 1.0f : 1.0f;
+        float emptyGrav = cell->Type == Empty ? 0.0f : 1.0f;
 
         float new_u =
             grid->GetCellU(i, j, k) +
@@ -115,11 +115,6 @@ void ComputeNewVelocities(Grid* grid)
         newValues.V = new_v;
         newValues.W = new_w;
         newValues.Pressure = cell->Pressure;
-
-        if (i == 15 && j == 13)
-        {
-            printf("asdasd");
-        }
 
         UpdatedCellValuesBuffer.push_back(newValues);
     }
@@ -278,7 +273,7 @@ void AdjustForIncompressibility(Grid* grid)
 
 void AddParticles(Grid* grid)
 {
-    if (particlesAdded > 120)
+    if (particlesAdded > 20)
         return;
 
     particlesAdded++;
@@ -296,7 +291,7 @@ void AddParticles(Grid* grid)
 
         if (cell->Boundary == Inflow)
         {
-            grid->AddParticle(cell);
+            grid->AddParticles(cell);
         }
     }
 }

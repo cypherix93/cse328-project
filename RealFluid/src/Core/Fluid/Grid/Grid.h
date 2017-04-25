@@ -24,7 +24,7 @@ class Grid
     FluidCell* GetCellAtIndex(int i, int j, int k);
     FluidCell* GetCellAtCoordinate(Coordinate coord);
     
-    void AddParticle(FluidCell* cell);
+    void AddParticles(FluidCell* cell);
 
 
     float GetCellU(int i, int j, int k) { if (IsBoundaryU(i, j, k)) return 0; return GetCellAtIndex(i, j, k)->U; }

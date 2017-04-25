@@ -89,12 +89,19 @@ FluidCell* Grid::GetCellAtCoordinate(Coordinate coord)
     return GetCellAtIndex(coord.X, coord.Y, coord.Z);
 }
 
-void Grid::AddParticle(FluidCell* cell)
+void Grid::AddParticles(FluidCell* cell)
 {
     float x, y, z;
-    x = cell->I + 0.5f;
-    y = cell->J + 0.5f;
-    z = cell->K;
 
-    ParticlesVector.push_back(new Particle(x, y, z));
+    for (auto i = 0; i < 3; i++)
+    {
+        x = cell->I;
+        y = cell->J;
+        z = cell->K;
+
+        x += static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
+        y += static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
+
+        ParticlesVector.push_back(new Particle(x, y, z));
+    }
 }
