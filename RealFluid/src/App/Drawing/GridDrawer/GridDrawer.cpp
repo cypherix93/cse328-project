@@ -39,14 +39,14 @@ void DrawCellGrid(Grid* grid, GridDrawOptions* options)
 
 void DrawCell(FluidCell* cell, GridDrawOptions* options)
 {
-    if (options->DrawCellOutline)
-        DrawCellOutline(cell, options);
-
     if (options->DrawCellVectors)
         DrawCellVectors(cell, options);
 
     if (options->DrawCellContents)
         DrawCellContents(cell, options);
+
+    if (options->DrawCellOutline)
+        DrawCellOutline(cell, options);
 }
 
 void DrawCellContents(FluidCell* cell, GridDrawOptions* options)
@@ -130,7 +130,7 @@ void DrawCellVectors(FluidCell* cell, GridDrawOptions* options)
 
     x += cell->U * options->CellDimensions;
     y += cell->V * options->CellDimensions;
-    z += cell->W * options->CellDimensions;
+    //z += cell->W * options->CellDimensions;
     glVertex3f(x, y, z);
 
     glEnd();

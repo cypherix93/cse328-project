@@ -63,11 +63,6 @@ void ComputeNewVelocities(Grid* grid)
 
         float emptyGrav = cell->Type == Empty ? 1.0f : 1.0f;
 
-        if (i == 1 && j == 13)
-        {
-            printf("asdasfa");
-        }
-
         float new_u =
             grid->GetCellU(i, j, k) +
             dt *
@@ -109,7 +104,7 @@ void ComputeNewVelocities(Grid* grid)
                 (v_dy2 * (grid->GetCellW(i, j + 1, k) - 2.0f * grid->GetCellW(i, j, k) + grid->GetCellW(i, j - 1, k))) +
                 (v_dz2 * (grid->GetCellW(i, j, k + 1) - 2.0f * grid->GetCellW(i, j, k) + grid->GetCellW(i, j, k - 1)))
                 );
-
+        
         // Update the values into the buffer to later replace the grid with
         struct UpdatedCellValues newValues;
         newValues.I = i;
