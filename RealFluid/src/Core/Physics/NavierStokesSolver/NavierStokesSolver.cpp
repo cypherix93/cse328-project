@@ -26,7 +26,7 @@ void ProcessGrid(Grid* grid)
     ComputeNewVelocities(grid);
 
     // Pressure iteration
-    AdjustForIncompressibility(grid);
+    //AdjustForIncompressibility(grid);
 
     // Update position of particles
     MoveParticles(grid);
@@ -57,12 +57,15 @@ void ComputeNewVelocities(Grid* grid)
         if (cell->Boundary == Inflow)
             continue;
 
+        if (cell->Type != Full)
+            continue;
+
         int i, j, k;
         i = cell->I;
         j = cell->J;
         k = cell->K;
 
-        float emptyGrav = cell->Type == Empty ? 0.0f : 1.0f;
+        float emptyGrav = cell->Type == Empty ? 1.0f : 1.0f;
 
         float new_u =
             grid->GetCellU(i, j, k) +
@@ -133,46 +136,19 @@ void AdjustBoundaryConditions(Grid* grid)
     {
         auto cell = cells[c];
 
-        if (cell->Type != Solid)
+        if (cell->Boundary == Inflow)
             continue;
 
-        int i, j, k;
-        i = cell->I;
-        j = cell->J;
-        k = cell->K;
-
-        auto t = grid->GetCellAtIndex(i, j + 1, k);
-        auto r = grid->GetCellAtIndex(i + 1, j, k);
-        auto l = grid->GetCellAtIndex(i - 1, j, k);
-
-        float totalPressure = 0.0;
-        float totalU = 0.0;
-        float totalV = 0.0;
-
-        if (t != nullptr && t->Type != Solid)
+        if (cell->Type == Solid)
         {
-            totalPressure += t->Pressure;
-            totalU += -(t->U);
+            auto newValues = Helpers::AdjustSolidCellConditions(grid, cell);
+            UpdatedCellValuesBuffer.push_back(newValues);
         }
-        if (l != nullptr && l->Type != Solid)
+        else if (cell->Type == Surface)
         {
-            totalV += -(l->V);
+            auto newValues = Helpers::AdjustSurfaceCellConditions(grid, cell);
+            UpdatedCellValuesBuffer.push_back(newValues);
         }
-        if (r != nullptr && r->Type != Solid)
-        {
-            totalV += -(r->V);
-        }
-
-        struct UpdatedCellValues newValues;
-        newValues.I = i;
-        newValues.J = j;
-        newValues.K = k;
-        newValues.U = totalU;
-        newValues.V = totalV;
-        newValues.W = 0.0;
-        newValues.Pressure = totalPressure;
-
-        UpdatedCellValuesBuffer.push_back(newValues);
     }
 
     // Apply the changes
@@ -206,7 +182,7 @@ void AdjustForIncompressibility(Grid* grid)
             if (cell->Boundary == Inflow)
                 continue;
 
-            if (cell->Type == Solid)
+            if (cell->Type != Full)
                 continue;
 
             int i, j, k;
@@ -273,14 +249,13 @@ void AdjustForIncompressibility(Grid* grid)
 
 void AddParticles(Grid* grid)
 {
-    if (particlesAdded > 20)
+    if (particlesAdded > 400)
         return;
 
     particlesAdded++;
 
-    if (particlesAdded % 4 != 0)
+    if (particlesAdded % 8 != 0)
         return;
-
 
     auto cells = *(grid->GetCellsVector());
 

@@ -39,5 +39,10 @@ class FluidCell
 
     // Getters
     Coordinate GetCoordinates() const;
+
+    // Checkers
+    bool IsSolid() const;
+    bool IsEmpty() const;
+    bool IsFluid() const;
 };
 
