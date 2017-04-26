@@ -92,6 +92,9 @@
     <ClInclude Include="src\Core\Helpers\GridHelper\GridHelper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\Core\Physics\Models\Environment.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

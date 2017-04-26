@@ -2,13 +2,14 @@
 
 #include <Core/Helpers/NavierStokesHelper/NavierStokesHelper.h>
 #include <Core/Helpers/GridHelper/GridHelper.h>
-
-float dt = 1.0f / 60.0f;
-float viscosity = 0.0001f;
-float atmPressure = 0.00f;
-Velocity gravity{ 0.0f, -0.098f, 0.0f };
+#include <Core/Physics/Models/Environment.h>
 
 auto particlesAdded = 0;
+
+extern float DT = 1.0f / 60.0f;
+extern float VISCOSITY = 0.0001f;
+extern float ATM_PRESSURE = 0.10f;
+extern Velocity GRAVITY{ 0.0f, -0.98f, 0.0f };
 
 /* Public */
 void ProcessGrid(Grid* grid)
@@ -26,7 +27,10 @@ void ProcessGrid(Grid* grid)
     ComputeNewVelocities(grid);
 
     // Pressure iteration
-    //AdjustForIncompressibility(grid);
+    AdjustForIncompressibility(grid);
+
+    // RE-Adjust boundary conditions for solid / surface cells
+    AdjustBoundaryConditions(grid);
 
     // Update position of particles
     MoveParticles(grid);
@@ -45,9 +49,9 @@ void ComputeNewVelocities(Grid* grid)
     dz2 = pow(dz, 2);
 
     float v_dx2, v_dy2, v_dz2;
-    v_dx2 = viscosity / dx2;
-    v_dy2 = viscosity / dy2;
-    v_dz2 = viscosity / dz2;
+    v_dx2 = VISCOSITY / dx2;
+    v_dy2 = VISCOSITY / dy2;
+    v_dz2 = VISCOSITY / dz2;
 
     #pragma omp parallel for
     for (auto c = 0; c < cells.size(); c++)
@@ -69,12 +73,12 @@ void ComputeNewVelocities(Grid* grid)
 
         float new_u =
             grid->GetCellU(i, j, k) +
-            dt *
+            DT *
             (
             ((1.0f / dx) * (pow(grid->GetCellAverageU(i, j, k), 2) - pow(grid->GetCellAverageU(i + 1, j, k), 2))) +
                 ((1.0f / dy) * (grid->GetCellUV(i, j - 1, k) - grid->GetCellUV(i, j, k))) +
                 ((1.0f / dz) * (grid->GetCellWU(i, j, k - 1) - grid->GetCellWU(i, j, k))) +
-                (gravity.U * emptyGrav) +
+                (GRAVITY.U * emptyGrav) +
                 ((1.0f / dx) * (grid->GetCellPressure(i, j, k) - grid->GetCellPressure(i + 1, j, k))) +
                 (v_dx2 * (grid->GetCellU(i + 1, j, k) - (2.0f * grid->GetCellU(i, j, k)) + grid->GetCellU(i - 1, j, k))) +
                 (v_dy2 * (grid->GetCellU(i, j + 1, k) - (2.0f * grid->GetCellU(i, j, k)) + grid->GetCellU(i, j - 1, k))) +
@@ -83,12 +87,12 @@ void ComputeNewVelocities(Grid* grid)
 
         float new_v =
             grid->GetCellV(i, j, k) +
-            dt *
+            DT *
             (
             ((1.0f / dx) * (grid->GetCellUV(i - 1, j, k) - grid->GetCellUV(i, j, k))) +
                 ((1.0f / dy) * (pow(grid->GetCellAverageV(i, j, k), 2) - pow(grid->GetCellAverageV(i, j + 1, k), 2))) +
                 ((1.0f / dz) * (grid->GetCellVW(i, j, k - 1) - grid->GetCellVW(i, j, k))) +
-                (gravity.V * emptyGrav) +
+                (GRAVITY.V * emptyGrav) +
                 ((1.0f / dy) * (grid->GetCellPressure(i, j, k) - grid->GetCellPressure(i, j + 1, k))) +
                 (v_dx2 * (grid->GetCellV(i + 1, j, k) - 2.0f * grid->GetCellV(i, j, k) + grid->GetCellV(i - 1, j, k))) +
                 (v_dy2 * (grid->GetCellV(i, j + 1, k) - 2.0f * grid->GetCellV(i, j, k) + grid->GetCellV(i, j - 1, k))) +
@@ -97,12 +101,12 @@ void ComputeNewVelocities(Grid* grid)
 
         float new_w =
             grid->GetCellW(i, j, k) +
-            dt *
+            DT *
             (
             ((1.0f / dx) * (grid->GetCellWU(i - 1, j, k) - grid->GetCellWU(i, j, k))) +
                 ((1.0f / dy) * (grid->GetCellVW(i, j - 1, k) - grid->GetCellVW(i, j, k))) +
                 ((1.0f / dz) * (pow(grid->GetCellAverageW(i, j, k), 2) - pow(grid->GetCellAverageW(i, j, k + 1), 2))) +
-                (gravity.W * emptyGrav) +
+                (GRAVITY.W * emptyGrav) +
                 ((1.0f / dz) * (grid->GetCellPressure(i, j, k) - grid->GetCellPressure(i, j, k + 1))) +
                 (v_dx2 * (grid->GetCellW(i + 1, j, k) - 2.0f * grid->GetCellW(i, j, k) + grid->GetCellW(i - 1, j, k))) +
                 (v_dy2 * (grid->GetCellW(i, j + 1, k) - 2.0f * grid->GetCellW(i, j, k) + grid->GetCellW(i, j - 1, k))) +
@@ -165,7 +169,7 @@ void AdjustForIncompressibility(Grid* grid)
     dy2 = pow(dy, 2);
     dz2 = pow(dz, 2);
 
-    float betaDenom = (2.0f * dt) * ((1.0f / dx2) + (1.0f / dy2) + (1.0f / dz2));
+    float betaDenom = (2.0f * DT) * ((1.0f / dx2) + (1.0f / dy2) + (1.0f / dz2));
     float B = BETA_0 / betaDenom;
 
     auto cells = *(grid->GetCellsVector());
@@ -209,9 +213,9 @@ void AdjustForIncompressibility(Grid* grid)
             dp = B * D;
 
             // Change in velocity due to pressure
-            du = (dt / dx) * dp;
-            dv = (dt / dy) * dp;
-            dw = (dt / dz) * dp;
+            du = (DT / dx) * dp;
+            dv = (DT / dy) * dp;
+            dw = (DT / dz) * dp;
 
             /*
             // Update next cells
@@ -300,7 +304,7 @@ void UpdateCellsWithParticles(Grid* grid)
             cell->Type = isFull ? Full : Empty;
 
         if (cell->Type == Empty)
-            cell->Pressure = atmPressure;
+            cell->Pressure = ATM_PRESSURE;
 
         // If cell was deemed full, determine if it is a surface
         if (cell->Type != Full)
@@ -340,7 +344,7 @@ void MoveParticles(Grid* grid)
 
         auto velocity = Helpers::ComputeParticleVelocity(grid, particle);
 
-        particle->MoveBy(dt * velocity.U, dt * velocity.V, dt * velocity.W);
+        particle->MoveBy(DT * velocity.U, DT * velocity.V, DT * velocity.W);
     }
 }
 

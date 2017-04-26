@@ -1,4 +1,5 @@
 #include "NavierStokesHelper.h"
+#include <Core/Physics/Models/Environment.h>
 
 struct UpdatedCellValues Helpers::AdjustSolidCellConditions(Grid* grid, FluidCell* cell)
 {
@@ -18,7 +19,7 @@ struct UpdatedCellValues Helpers::AdjustSolidCellConditions(Grid* grid, FluidCel
     if (t != nullptr && t->Type != Solid)
     {
         totalPressure += t->Pressure;
-        //totalU += -(t->U);
+        totalU += -(t->U);
     }
     if (l != nullptr && l->Type != Solid)
     {
@@ -53,7 +54,6 @@ UpdatedCellValues Helpers::AdjustSurfaceCellConditions(Grid* grid, FluidCell* ce
     auto b = grid->GetCellAtIndex(i, j - 1, k);
     auto l = grid->GetCellAtIndex(i - 1, j, k);
 
-    float totalPressure = 0.0;
     float totalU = 0.0;
     float totalV = 0.0;
 
@@ -62,14 +62,22 @@ UpdatedCellValues Helpers::AdjustSurfaceCellConditions(Grid* grid, FluidCell* ce
     {
         if (l != nullptr && l->IsFluid())
         {
-            totalU = l->U;
+            totalU += l->U;
+        }
+        else
+        {
+            totalU += GRAVITY.U;
         }
     }
     if (l != nullptr && l->Type == Empty)
     {
         if (r != nullptr && r->IsFluid())
         {
-            totalU = r->U;
+            totalU += r->U;
+        }
+        else
+        {
+            totalU += GRAVITY.U;
         }
     }
 
@@ -78,14 +86,22 @@ UpdatedCellValues Helpers::AdjustSurfaceCellConditions(Grid* grid, FluidCell* ce
     {
         if (b != nullptr && b->IsFluid())
         {
-            totalV = b->V;
+            totalV += b->V;
+        }
+        else
+        {
+            totalV += GRAVITY.V;
         }
     }
     if (b != nullptr && b->Type == Empty)
     {
         if (t != nullptr && t->IsFluid())
         {
-            totalV = t->V;
+            totalV += t->V;
+        }
+        else
+        {
+            totalV += GRAVITY.V;
         }
     }
 
@@ -96,7 +112,7 @@ UpdatedCellValues Helpers::AdjustSurfaceCellConditions(Grid* grid, FluidCell* ce
     newValues.U = totalU;
     newValues.V = totalV;
     newValues.W = 0.0;
-    newValues.Pressure = totalPressure;
+    newValues.Pressure = cell->Pressure;
 
     return newValues;
 }
