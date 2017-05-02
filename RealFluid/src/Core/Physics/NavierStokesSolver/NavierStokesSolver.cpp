@@ -4,11 +4,9 @@
 #include <Core/Helpers/GridHelper/GridHelper.h>
 #include <Core/Physics/Models/Environment.h>
 
-auto particlesAdded = 0;
-
 extern float DT = 1.0f / 60.0f;
 extern float VISCOSITY = 0.0001f;
-extern float ATM_PRESSURE = 0.10f;
+extern float ATM_PRESSURE = 1.0;
 extern Velocity GRAVITY{ 0.0f, -0.98f, 0.0f };
 
 /* Public */
@@ -30,7 +28,7 @@ void ProcessGrid(Grid* grid)
     AdjustForIncompressibility(grid);
 
     // RE-Adjust boundary conditions for solid / surface cells
-    AdjustBoundaryConditions(grid);
+    //AdjustBoundaryConditions(grid);
 
     // Update position of particles
     MoveParticles(grid);
@@ -61,7 +59,10 @@ void ComputeNewVelocities(Grid* grid)
         if (cell->Boundary == Inflow)
             continue;
 
-        if (cell->Type != Full)
+        if (cell->Type == Solid)
+            continue;
+
+        if (cell->Type == Surface)
             continue;
 
         int i, j, k;
@@ -69,7 +70,7 @@ void ComputeNewVelocities(Grid* grid)
         j = cell->J;
         k = cell->K;
 
-        float emptyGrav = cell->Type == Empty ? 1.0f : 1.0f;
+        float emptyGrav = cell->Type == Empty ? 0.0f : 1.0f;
 
         float new_u =
             grid->GetCellU(i, j, k) +
@@ -135,7 +136,6 @@ void AdjustBoundaryConditions(Grid* grid)
 {
     auto cells = *(grid->GetCellsVector());
 
-    #pragma omp parallel for
     for (auto c = 0; c < cells.size(); c++)
     {
         auto cell = cells[c];
@@ -153,9 +153,29 @@ void AdjustBoundaryConditions(Grid* grid)
             auto newValues = Helpers::AdjustSurfaceCellConditions(grid, cell);
             UpdatedCellValuesBuffer.push_back(newValues);
         }
+        /*else if (cell->Type == Empty)
+        {
+            auto newValues = Helpers::AdjustEmptyCellConditions(grid, cell);
+            UpdatedCellValuesBuffer.push_back(newValues);
+        }*/
     }
 
-    // Apply the changes
+    UpdateCellValues(grid);
+
+    for (auto c = 0; c < cells.size(); c++)
+    {
+        auto cell = cells[c];
+
+        if (cell->Boundary == Inflow)
+            continue;
+
+        if (cell->IsFluid())
+        {
+            auto newValues = Helpers::AdjustSolidTouchingCellConditions(grid, cell);
+            UpdatedCellValuesBuffer.push_back(newValues);
+        }
+    }
+
     UpdateCellValues(grid);
 }
 
@@ -174,7 +194,7 @@ void AdjustForIncompressibility(Grid* grid)
 
     auto cells = *(grid->GetCellsVector());
 
-    for (auto iters = 0; iters < 20; iters++)
+    for (auto iters = 0; iters < 10; iters++)
     {
         auto needsRecompute = false;
 
@@ -253,17 +273,8 @@ void AdjustForIncompressibility(Grid* grid)
 
 void AddParticles(Grid* grid)
 {
-    if (particlesAdded > 400)
-        return;
-
-    particlesAdded++;
-
-    if (particlesAdded % 8 != 0)
-        return;
-
     auto cells = *(grid->GetCellsVector());
 
-    #pragma omp parallel for
     for (auto c = 0; c < cells.size(); c++)
     {
         auto cell = cells[c];
@@ -281,7 +292,6 @@ void UpdateCellsWithParticles(Grid* grid)
 
     auto cells = *(grid->GetCellsVector());
 
-    #pragma omp parallel for
     for (auto c = 0; c < cells.size(); c++)
     {
         auto cell = cells[c];
@@ -337,7 +347,7 @@ void MoveParticles(Grid* grid)
 {
     auto particles = *(grid->GetParticlesVector());
 
-    //    #pragma omp parallel for
+    #pragma omp parallel for
     for (auto p = 0; p < particles.size(); p++)
     {
         auto particle = particles[p];

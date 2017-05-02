@@ -7,4 +7,6 @@ namespace Helpers
 {
     struct UpdatedCellValues AdjustSolidCellConditions(Grid* grid, FluidCell* cell);
     struct UpdatedCellValues AdjustSurfaceCellConditions(Grid* grid, FluidCell* cell);
+    struct UpdatedCellValues AdjustEmptyCellConditions(Grid* grid, FluidCell* cell);
+    struct UpdatedCellValues AdjustSolidTouchingCellConditions(Grid* grid, FluidCell* cell);
 }

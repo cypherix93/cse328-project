@@ -50,7 +50,7 @@ void Grid::ConstructGrid()
             if (cell->Type != Solid && i < 1)
             {
                 cell->Boundary = Inflow;
-                cell->U = 1.2f;
+                cell->U = 3.2f;
             }
 
             CellsVector.push_back(cell);
@@ -93,7 +93,7 @@ void Grid::AddParticles(FluidCell* cell)
 {
     float x, y, z;
 
-    for (auto i = 0; i < 3; i++)
+    for (auto i = 0; i < 2; i++)
     {
         x = cell->I;
         y = cell->J;
