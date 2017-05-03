@@ -99,7 +99,6 @@ void Grid::AddParticles(FluidCell* cell)
         y = cell->J;
         z = cell->K;
 
-        x += static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
         y += static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
 
         ParticlesVector.push_back(new Particle(x, y, z));
