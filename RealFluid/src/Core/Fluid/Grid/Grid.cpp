@@ -1,10 +1,12 @@
 #include "Grid.h"
 
-Grid::Grid(int width, int height, int cellDimensions)
+#include <Core/Helpers/GridHelper/GridHelper.h>
+
+Grid::Grid(int xCells, int yCells, int zCells)
 {
-    Width = width;
-    Height = height;
-    CellDimensions = cellDimensions;
+    CellsX = xCells;
+    CellsY = yCells;
+    CellsZ = zCells;
 
     ConstructGrid();
 }
@@ -31,20 +33,14 @@ vector<Particle*>* Grid::GetParticlesVector()
 
 void Grid::ConstructGrid()
 {
-    CellsX = Width / CellDimensions;
-    CellsY = Height / CellDimensions;
-    CellsZ = 1;
-
     for (auto i = 0; i < CellsX; i++)
     {
         for (auto j = 0; j < CellsY; j++)
         {
             auto cell = new FluidCell();
-            cell->X = CellDimensions * i;
-            cell->Y = CellDimensions * j;
-            cell->Z = 0;
-
-            cell->Width = cell->Height = cell->Depth = CellDimensions;
+            cell->I = i;
+            cell->J = j;
+            cell->K = 0;
 
             if (j < 2 || (i < 1 && j < CellsY - 3) || (i > CellsX - 2 && j < CellsY - 3))
             {
@@ -54,7 +50,7 @@ void Grid::ConstructGrid()
             if (cell->Type != Solid && i < 1)
             {
                 cell->Boundary = Inflow;
-                cell->U = 60.0;
+                cell->U = 3.2f;
             }
 
             CellsVector.push_back(cell);
@@ -63,8 +59,7 @@ void Grid::ConstructGrid()
 
     for (auto cell : CellsVector)
     {
-        auto index = GetCellIndex(cell->X, cell->Y, cell->Z);
-        CellsMap[Helpers::GetCellKey(index[0], index[1], index[2])] = cell;
+        CellsMap[Helpers::GetCellKey(cell->I, cell->J, cell->K)] = cell;
     }
 }
 
@@ -89,28 +84,23 @@ FluidCell* Grid::GetCellAtIndex(int i, int j, int k)
     return CellsMap[Helpers::GetCellKey(i, j, k)];
 }
 
-FluidCell* Grid::GetCellAtPixel(int x, int y, int z)
+FluidCell* Grid::GetCellAtCoordinate(Coordinate coord)
 {
-    auto index = GetCellIndex(x, y, z);
-
-    return GetCellAtIndex(index[0], index[1], index[2]);
+    return GetCellAtIndex(coord.X, coord.Y, coord.Z);
 }
 
-vector<int> Grid::GetCellIndex(int x, int y, int z)
+void Grid::AddParticles(FluidCell* cell)
 {
-    auto i = x / CellDimensions;
-    auto j = y / CellDimensions;
-    auto k = z / CellDimensions;
+    float x, y, z;
 
-    return{ i, j, k };
-}
+    for (auto i = 0; i < 2; i++)
+    {
+        x = cell->I;
+        y = cell->J;
+        z = cell->K;
 
-void Grid::AddParticle(FluidCell* cell)
-{
-    int x, y, z;
-    x = cell->X + (CellDimensions / 2);
-    y = cell->Y + (CellDimensions / 2);
-    z = cell->Z;
+        y += static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
 
-    ParticlesVector.push_back(new Particle(x, y, z));
+        ParticlesVector.push_back(new Particle(x, y, z));
+    }
 }

@@ -1,17 +1,19 @@
 #pragma once
 #include <map>
 
-#include <Core/Helpers/GridHelper/GridHelper.h>
 #include <Core/Fluid/Particle/Particle.h>
 #include <Core/Fluid/Cell/FluidCell.h>
+#include <Core/Physics/Models/Coordinate.h>
 
 using namespace std;
 
 class Grid
 {
     public:
-    Grid(int width, int height, int cellDimensions);
+    Grid(int xCells, int yCells, int zCells);
     virtual ~Grid();
+
+    int CellsX, CellsY, CellsZ;
 
     // Grid Operations
     map<string, FluidCell*>* GetCellsMap();
@@ -20,36 +22,28 @@ class Grid
 
     // Cell Operations
     FluidCell* GetCellAtIndex(int i, int j, int k);
-    FluidCell* GetCellAtPixel(int x, int y, int z);
-
-    vector<int> GetCellIndex(int x, int y, int z);
-
-    void AddParticle(FluidCell* cell);
+    FluidCell* GetCellAtCoordinate(Coordinate coord);
+    
+    void AddParticles(FluidCell* cell);
 
 
-    float get_u_plus(int i, int j, int k) { if (u_boundary(i, j, k)) return 0; return GetCellAtIndex(i, j, k)->U; }
-    float get_v_plus(int i, int j, int k) { if (v_boundary(i, j, k)) return 0; return GetCellAtIndex(i, j, k)->V; }
-    float get_w_plus(int i, int j, int k) { if (w_boundary(i, j, k)) return 0; return GetCellAtIndex(i, j, k)->W; }
+    float GetCellU(int i, int j, int k) { if (IsBoundaryU(i, j, k)) return 0; return GetCellAtIndex(i, j, k)->U; }
+    float GetCellV(int i, int j, int k) { if (IsBoundaryV(i, j, k)) return 0; return GetCellAtIndex(i, j, k)->V; }
+    float GetCellW(int i, int j, int k) { if (IsBoundaryW(i, j, k)) return 0; return GetCellAtIndex(i, j, k)->W; }
 
-    float get_u_avg(int i, int j, int k) { return 0.5*(get_u_plus(i - 1, j, k) + get_u_plus(i, j, k)); }
-    float get_v_avg(int i, int j, int k) { return 0.5*(get_v_plus(i, j - 1, k) + get_v_plus(i, j, k)); }
-    float get_w_avg(int i, int j, int k) { return 0.5*(get_w_plus(i, j, k - 1) + get_w_plus(i, j, k)); }
+    float GetCellAverageU(int i, int j, int k) { return (GetCellU(i - 1, j, k) + GetCellU(i, j, k)) * 0.5; }
+    float GetCellAverageV(int i, int j, int k) { return (GetCellV(i, j - 1, k) + GetCellV(i, j, k)) * 0.5; }
+    float GetCellAverageW(int i, int j, int k) { return (GetCellW(i, j, k - 1) + GetCellW(i, j, k)) * 0.5; }
 
-    float get_uv_plus(int i, int j, int k) {
-        return 0.5*(get_u_plus(i, j, k) + get_u_plus(i, j + 1, k)) * 0.5*(get_v_plus(i, j, k) + get_v_plus(i + 1, j, k));
-    }
-    float get_uw_plus(int i, int j, int k) {
-        return 0.5*(get_u_plus(i, j, k) + get_u_plus(i, j, k + 1)) * 0.5*(get_w_plus(i, j, k) + get_w_plus(i + 1, j, k));
-    }
-    float get_vw_plus(int i, int j, int k) {
-        return 0.5*(get_v_plus(i, j, k) + get_v_plus(i, j, k + 1)) * 0.5*(get_w_plus(i, j, k) + get_w_plus(i, j + 1, k));
-    }
+    float GetCellUV(int i, int j, int k) { return GetCellAverageU(i, j, k) * GetCellAverageV(i, j, k); }
+    float GetCellVW(int i, int j, int k) { return GetCellAverageV(i, j, k) * GetCellAverageW(i, j, k); }
+    float GetCellWU(int i, int j, int k) { return GetCellAverageW(i, j, k) * GetCellAverageU(i, j, k); }
 
-    bool u_boundary(int i, int j, int k) { if (i >= 0 && i < CellsX - 1 && j >= 0 && j < CellsY && k >= 0 && k < CellsZ) return false; return true; }
-    bool v_boundary(int i, int j, int k) { if (i >= 0 && i < CellsX && j >= 0 && j < CellsY - 1 && k >= 0 && k < CellsZ) return false; return true; }
-    bool w_boundary(int i, int j, int k) { if (i >= 0 && i < CellsX && j >= 0 && j < CellsY && k >= 0 && k < CellsZ - 1) return false; return true; }
+    bool IsBoundaryU(int i, int j, int k) { if (i >= 0 && i < CellsX - 1 && j >= 0 && j < CellsY && k >= 0 && k < CellsZ) return false; return true; }
+    bool IsBoundaryV(int i, int j, int k) { if (i >= 0 && i < CellsX && j >= 0 && j < CellsY - 1 && k >= 0 && k < CellsZ) return false; return true; }
+    bool IsBoundaryW(int i, int j, int k) { if (i >= 0 && i < CellsX && j >= 0 && j < CellsY && k >= 0 && k < CellsZ - 1) return false; return true; }
 
-    float getPressure(int i, int j, int k) { if (u_boundary(i, j, k)) return 0; return GetCellAtIndex(i, j, k)->Pressure; }
+    float GetCellPressure(int i, int j, int k) { if (IsBoundaryU(i, j, k)) return 0; return GetCellAtIndex(i, j, k)->Pressure; }
 
 
     private:
@@ -57,10 +51,6 @@ class Grid
     vector<FluidCell*> CellsVector;
 
     vector<Particle*> ParticlesVector;
-
-    int Width, Height;
-    int CellsX, CellsY, CellsZ;
-    int CellDimensions;
 
     void ConstructGrid();
     void DestructGrid();

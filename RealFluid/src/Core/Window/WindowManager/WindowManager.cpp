@@ -57,6 +57,11 @@ void WindowManager::OpenWindow(std::string title, int width, int height)
     _IsRunning = true;
 }
 
+void WindowManager::ResizeWindow(int width, int height)
+{
+    SDL_SetWindowSize(_Window, width, height);
+}
+
 void WindowManager::Start(int fps)
 {
     auto delay = 1000 / fps;

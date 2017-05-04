@@ -1,51 +1,55 @@
 #include "NavierStokesSolver.h"
 
-auto dt = 1.0 / 20.0;
-auto viscosity = 0.0001;
-vector<float> gravity = { 0.0f, -9.8f, 0.0f };
+#include <Core/Helpers/NavierStokesHelper/NavierStokesHelper.h>
+#include <Core/Helpers/GridHelper/GridHelper.h>
+#include <Core/Physics/Models/Environment.h>
 
-auto particlesAdded = 0;
+extern float DT = 1.0f / 60.0f;
+extern float VISCOSITY = 0.0001f;
+extern float ATM_PRESSURE = 1.0;
+extern Velocity GRAVITY{ 0.0f, -0.98f, 0.0f };
 
 /* Public */
 void ProcessGrid(Grid* grid)
 {
-    if (particlesAdded < 40)
-    {
-        particlesAdded++;
+    // Add Particles to Grid
+    AddParticles(grid);
 
-        if (particlesAdded % 4 == 0)
-            AddParticles(grid);
-    }
+    // Update cell types based on particles
     UpdateCellsWithParticles(grid);
 
+    // Adjust boundary conditions for solid / surface cells
     AdjustBoundaryConditions(grid);
-    UpdateNewVelocities(grid);
-//    AdjustForIncompressibility(grid);
 
-    MoveParticles(grid);
-}
-
-void UpdateNewVelocities(Grid* grid)
-{
+    // Update velocities for cells
     ComputeNewVelocities(grid);
 
-    #pragma omp parallel for
-    for (auto c = 0; c < UpdatedCellVectorBuffer.size(); c++)
-    {
-        auto update = UpdatedCellVectorBuffer[c];
+    // Pressure iteration
+    AdjustForIncompressibility(grid);
 
-        auto cell = grid->GetCellAtIndex(update.I, update.J, update.K);
-        cell->U = update.U;
-        cell->V = update.V;
-        cell->W = update.W;
-    }
+    // RE-Adjust boundary conditions for solid / surface cells
+    //AdjustBoundaryConditions(grid);
 
-    UpdatedCellVectorBuffer.clear();
+    // Update position of particles
+    MoveParticles(grid);
 }
 
 void ComputeNewVelocities(Grid* grid)
 {
     auto cells = *(grid->GetCellsVector());
+
+    float dx, dy, dz;
+    float dx2, dy2, dz2;
+
+    dx = dy = dz = 1.0f;
+    dx2 = pow(dx, 2);
+    dy2 = pow(dy, 2);
+    dz2 = pow(dz, 2);
+
+    float v_dx2, v_dy2, v_dz2;
+    v_dx2 = VISCOSITY / dx2;
+    v_dy2 = VISCOSITY / dy2;
+    v_dz2 = VISCOSITY / dz2;
 
     #pragma omp parallel for
     for (auto c = 0; c < cells.size(); c++)
@@ -55,78 +59,76 @@ void ComputeNewVelocities(Grid* grid)
         if (cell->Boundary == Inflow)
             continue;
 
+        if (cell->Type == Solid)
+            continue;
+
+        if (cell->Type == Surface)
+            continue;
+
         int i, j, k;
-        double dx, dy, dz;
-        double dx2, dy2, dz2;
+        i = cell->I;
+        j = cell->J;
+        k = cell->K;
 
-        auto index = grid->GetCellIndex(cell->X, cell->Y, cell->Z);
-        i = index[0];
-        j = index[1];
-        k = index[2];
-
-        dx = cell->Width;
-        dy = cell->Height;
-        dz = cell->Depth;
-
-        dx2 = pow(dx, 2);
-        dy2 = pow(dy, 2);
-        dz2 = pow(dz, 2);
-
-        auto emptyGrav = cell->Type == Empty ? 1.0 : 1.0;
+        float emptyGrav = cell->Type == Empty ? 0.0f : 1.0f;
 
         float new_u =
-            grid->get_u_plus(i, j, k) +
-            dt *
+            grid->GetCellU(i, j, k) +
+            DT *
             (
-            ((1.0 / dx) * (pow(grid->get_u_avg(i, j, k), 2) - pow(grid->get_u_avg(i + 1, j, k), 2))) +
-                ((1.0 / dy) * (grid->get_uv_plus(i, j - 1, k) - grid->get_uv_plus(i, j, k))) +
-                ((1.0 / dz) * (grid->get_uw_plus(i, j, k - 1) - grid->get_uw_plus(i, j, k))) +
-                (gravity[0] * emptyGrav) +
-                ((1.0 / dx) * (grid->getPressure(i, j, k) - grid->getPressure(i + 1, j, k))) +
-                ((viscosity / dx2) * (grid->get_u_plus(i + 1, j, k) - 2 * grid->get_u_plus(i, j, k) + grid->get_u_plus(i - 1, j, k))) +
-                ((viscosity / dy2) * (grid->get_u_plus(i, j + 1, k) - 2 * grid->get_u_plus(i, j, k) + grid->get_u_plus(i, j - 1, k))) +
-                ((viscosity / dz2) * (grid->get_u_plus(i, j, k + 1) - 2 * grid->get_u_plus(i, j, k) + grid->get_u_plus(i, j, k - 1)))
+            ((1.0f / dx) * (pow(grid->GetCellAverageU(i, j, k), 2) - pow(grid->GetCellAverageU(i + 1, j, k), 2))) +
+                ((1.0f / dy) * (grid->GetCellUV(i, j - 1, k) - grid->GetCellUV(i, j, k))) +
+                ((1.0f / dz) * (grid->GetCellWU(i, j, k - 1) - grid->GetCellWU(i, j, k))) +
+                (GRAVITY.U * emptyGrav) +
+                ((1.0f / dx) * (grid->GetCellPressure(i, j, k) - grid->GetCellPressure(i + 1, j, k))) +
+                (v_dx2 * (grid->GetCellU(i + 1, j, k) - (2.0f * grid->GetCellU(i, j, k)) + grid->GetCellU(i - 1, j, k))) +
+                (v_dy2 * (grid->GetCellU(i, j + 1, k) - (2.0f * grid->GetCellU(i, j, k)) + grid->GetCellU(i, j - 1, k))) +
+                (v_dz2 * (grid->GetCellU(i, j, k + 1) - (2.0f * grid->GetCellU(i, j, k)) + grid->GetCellU(i, j, k - 1)))
                 );
 
         float new_v =
-            grid->get_v_plus(i, j, k) +
-            dt *
+            grid->GetCellV(i, j, k) +
+            DT *
             (
-            ((1 / dx) * (grid->get_uv_plus(i - 1, j, k) - grid->get_uv_plus(i, j, k))) +
-                ((1.0 / dy) * (pow(grid->get_v_avg(i, j, k), 2) - pow(grid->get_v_avg(i, j + 1, k), 2))) +
-                ((1.0 / dz) * (grid->get_vw_plus(i, j, k - 1) - grid->get_vw_plus(i, j, k))) +
-                (gravity[1] * emptyGrav) +
-                ((1.0 / dy) * (grid->getPressure(i, j, k) - grid->getPressure(i, j + 1, k))) +
-                ((viscosity / dx2) * (grid->get_v_plus(i + 1, j, k) - 2 * grid->get_v_plus(i, j, k) + grid->get_v_plus(i - 1, j, k))) +
-                ((viscosity / dy2) * (grid->get_v_plus(i, j + 1, k) - 2 * grid->get_v_plus(i, j, k) + grid->get_v_plus(i, j - 1, k))) +
-                ((viscosity / dz2) * (grid->get_v_plus(i, j, k + 1) - 2 * grid->get_v_plus(i, j, k) + grid->get_v_plus(i, j, k - 1)))
+            ((1.0f / dx) * (grid->GetCellUV(i - 1, j, k) - grid->GetCellUV(i, j, k))) +
+                ((1.0f / dy) * (pow(grid->GetCellAverageV(i, j, k), 2) - pow(grid->GetCellAverageV(i, j + 1, k), 2))) +
+                ((1.0f / dz) * (grid->GetCellVW(i, j, k - 1) - grid->GetCellVW(i, j, k))) +
+                (GRAVITY.V * emptyGrav) +
+                ((1.0f / dy) * (grid->GetCellPressure(i, j, k) - grid->GetCellPressure(i, j + 1, k))) +
+                (v_dx2 * (grid->GetCellV(i + 1, j, k) - 2.0f * grid->GetCellV(i, j, k) + grid->GetCellV(i - 1, j, k))) +
+                (v_dy2 * (grid->GetCellV(i, j + 1, k) - 2.0f * grid->GetCellV(i, j, k) + grid->GetCellV(i, j - 1, k))) +
+                (v_dz2 * (grid->GetCellV(i, j, k + 1) - 2.0f * grid->GetCellV(i, j, k) + grid->GetCellV(i, j, k - 1)))
                 );
 
         float new_w =
-            grid->get_w_plus(i, j, k) +
-            dt *
+            grid->GetCellW(i, j, k) +
+            DT *
             (
-            ((1.0 / dx) * (grid->get_uw_plus(i - 1, j, k) - grid->get_uw_plus(i, j, k))) +
-                ((1.0 / dy) * (grid->get_vw_plus(i, j - 1, k) - grid->get_vw_plus(i, j, k))) +
-                ((1.0 / dz) * (pow(grid->get_w_avg(i, j, k), 2) - pow(grid->get_w_avg(i, j, k + 1), 2))) +
-                (gravity[2] * emptyGrav) +
-                ((1.0 / dz) * (grid->getPressure(i, j, k) - grid->getPressure(i, j, k + 1))) +
-                ((viscosity / dx2) * (grid->get_w_plus(i + 1, j, k) - 2 * grid->get_w_plus(i, j, k) + grid->get_w_plus(i - 1, j, k))) +
-                ((viscosity / dy2) * (grid->get_w_plus(i, j + 1, k) - 2 * grid->get_w_plus(i, j, k) + grid->get_w_plus(i, j - 1, k))) +
-                ((viscosity / dz2) * (grid->get_w_plus(i, j, k + 1) - 2 * grid->get_w_plus(i, j, k) + grid->get_w_plus(i, j, k - 1)))
+            ((1.0f / dx) * (grid->GetCellWU(i - 1, j, k) - grid->GetCellWU(i, j, k))) +
+                ((1.0f / dy) * (grid->GetCellVW(i, j - 1, k) - grid->GetCellVW(i, j, k))) +
+                ((1.0f / dz) * (pow(grid->GetCellAverageW(i, j, k), 2) - pow(grid->GetCellAverageW(i, j, k + 1), 2))) +
+                (GRAVITY.W * emptyGrav) +
+                ((1.0f / dz) * (grid->GetCellPressure(i, j, k) - grid->GetCellPressure(i, j, k + 1))) +
+                (v_dx2 * (grid->GetCellW(i + 1, j, k) - 2.0f * grid->GetCellW(i, j, k) + grid->GetCellW(i - 1, j, k))) +
+                (v_dy2 * (grid->GetCellW(i, j + 1, k) - 2.0f * grid->GetCellW(i, j, k) + grid->GetCellW(i, j - 1, k))) +
+                (v_dz2 * (grid->GetCellW(i, j, k + 1) - 2.0f * grid->GetCellW(i, j, k) + grid->GetCellW(i, j, k - 1)))
                 );
 
         // Update the values into the buffer to later replace the grid with
-        struct UpdatedCellVector newVector;
-        newVector.I = i;
-        newVector.J = j;
-        newVector.K = k;
-        newVector.U = new_u;
-        newVector.V = new_v;
-        newVector.W = new_w;
+        struct UpdatedCellValues newValues;
+        newValues.I = i;
+        newValues.J = j;
+        newValues.K = k;
+        newValues.U = new_u;
+        newValues.V = new_v;
+        newValues.W = new_w;
+        newValues.Pressure = cell->Pressure;
 
-        UpdatedCellVectorBuffer.push_back(newVector);
+        UpdatedCellValuesBuffer.push_back(newValues);
     }
+
+    // Apply the changes
+    UpdateCellValues(grid);
 }
 
 /* Private */
@@ -134,111 +136,152 @@ void AdjustBoundaryConditions(Grid* grid)
 {
     auto cells = *(grid->GetCellsVector());
 
-    #pragma omp parallel for
     for (auto c = 0; c < cells.size(); c++)
     {
         auto cell = cells[c];
 
-        Helpers::AdjustSolidCellConditions(grid, cell);
+        if (cell->Boundary == Inflow)
+            continue;
+
+        if (cell->Type == Solid)
+        {
+            auto newValues = Helpers::AdjustSolidCellConditions(grid, cell);
+            UpdatedCellValuesBuffer.push_back(newValues);
+        }
+        else if (cell->Type == Surface)
+        {
+            auto newValues = Helpers::AdjustSurfaceCellConditions(grid, cell);
+            UpdatedCellValuesBuffer.push_back(newValues);
+        }
+        /*else if (cell->Type == Empty)
+        {
+            auto newValues = Helpers::AdjustEmptyCellConditions(grid, cell);
+            UpdatedCellValuesBuffer.push_back(newValues);
+        }*/
     }
+
+    UpdateCellValues(grid);
+
+    for (auto c = 0; c < cells.size(); c++)
+    {
+        auto cell = cells[c];
+
+        if (cell->Boundary == Inflow)
+            continue;
+
+        if (cell->IsFluid())
+        {
+            auto newValues = Helpers::AdjustSolidTouchingCellConditions(grid, cell);
+            UpdatedCellValuesBuffer.push_back(newValues);
+        }
+    }
+
+    UpdateCellValues(grid);
 }
 
 void AdjustForIncompressibility(Grid* grid)
 {
-    auto iters = 0;
-    auto needsReprocessing = false;
+    float dx, dy, dz;
+    float dx2, dy2, dz2;
+
+    dx = dy = dz = 1.0f;
+    dx2 = pow(dx, 2);
+    dy2 = pow(dy, 2);
+    dz2 = pow(dz, 2);
+
+    float betaDenom = (2.0f * DT) * ((1.0f / dx2) + (1.0f / dy2) + (1.0f / dz2));
+    float B = BETA_0 / betaDenom;
 
     auto cells = *(grid->GetCellsVector());
 
-    do
+    for (auto iters = 0; iters < 10; iters++)
     {
-        iters++;
+        auto needsRecompute = false;
 
         #pragma omp parallel for
         for (auto c = 0; c < cells.size(); c++)
         {
             auto cell = cells[c];
 
+            if (cell->Boundary == Inflow)
+                continue;
+
+            if (cell->Type != Full)
+                continue;
+
             int i, j, k;
-            double dx, dy, dz;
-            double dx2, dy2, dz2;
             float du, dv, dw;
 
             float Dx, Dy, Dz;
-            float betaDenom;
+            float D, dp;
 
-            float D, B, dp;
-
-            auto index = grid->GetCellIndex(cell->X, cell->Y, cell->Z);
-            i = index[0];
-            j = index[1];
-            k = index[2];
-
-            dx = cell->Width;
-            dy = cell->Height;
-            dz = cell->Depth;
-
-            dx2 = pow(dx, 2);
-            dy2 = pow(dy, 2);
-            dz2 = pow(dz, 2);
+            i = cell->I;
+            j = cell->J;
+            k = cell->K;
 
             // Divergence
-            Dx = (1.0 / dx) * (grid->get_u_plus(i + 1, j, k) - grid->get_u_plus(i, j, k));
-            Dy = (1.0 / dy) * (grid->get_v_plus(i, j + 1, k) - grid->get_v_plus(i, j, k));
-            Dz = (1.0 / dz) * (grid->get_w_plus(i, j, k + 1) - grid->get_w_plus(i, j, k));
+            Dx = (1.0f / dx) * (grid->GetCellU(i, j, k) - grid->GetCellU(i - 1, j, k));
+            Dy = (1.0f / dy) * (grid->GetCellV(i, j, k) - grid->GetCellV(i, j - 1, k));
+            Dz = (1.0f / dz) * (grid->GetCellW(i, j, k) - grid->GetCellW(i, j, k - 1));
 
             D = -(Dx + Dy + Dz);
 
-            // Beta
-            betaDenom = (2.0 * dt) * ((1.0 / dx2) + (1.0 / dy2) + (1.0 / dz2));
-
-            B = BETA_0 / betaDenom;
+            if (abs(D) > EPSILON)
+                needsRecompute = true;
 
             // Pressure
             dp = B * D;
 
             // Change in velocity due to pressure
-            du = (dt / dx) * dp;
-            dv = (dt / dy) * dp;
-            dw = (dt / dz) * dp;
+            du = (DT / dx) * dp;
+            dv = (DT / dy) * dp;
+            dw = (DT / dz) * dp;
 
-            // Update this cell
-            cell->U -= du;
-            cell->V -= dv;
-            cell->W -= dw;
+            /*
+            // Update next cells
+            auto prev_x = grid->GetCellAtIndex(i - 1, j, k);
+            auto prev_y = grid->GetCellAtIndex(i, j - 1, k);
+            auto prev_z = grid->GetCellAtIndex(i, j, k - 1);
+            if (prev_x != nullptr)
+                prev_x->U -= du;
+            if (prev_y != nullptr)
+                prev_y->V -= dv;
+            if (prev_z != nullptr)
+                prev_z->W -= dw;
+            //*/
 
-            // Update next cells 
-            auto next_x = grid->GetCellAtIndex(i + 1, j, k);
-            auto next_y = grid->GetCellAtIndex(i, j + 1, k);
-            auto next_z = grid->GetCellAtIndex(i, j, k + 1);
 
-            if (next_x != nullptr)
-                next_x->U += du;
-            if (next_y != nullptr)
-                next_y->V += dv;
-            if (next_z != nullptr)
-                next_z->W += dw;
+            struct UpdatedCellValues newValues;
+            newValues.I = i;
+            newValues.J = j;
+            newValues.K = k;
+            newValues.U = cell->U + du;
+            newValues.V = cell->V + dv;
+            newValues.W = cell->W + dw;
+            newValues.Pressure = cell->Pressure + dp;
 
-            // Update this cell's pressure
-            cell->Pressure += dp;
-
-            needsReprocessing = (iters < 3) && (abs(D) > EPSILON);
+            UpdatedCellValuesBuffer.push_back(newValues);
         }
-    } while (needsReprocessing);
+
+        // Apply the changes
+        UpdateCellValues(grid);
+
+        if (!needsRecompute)
+            break;
+    }
 }
 
 void AddParticles(Grid* grid)
 {
     auto cells = *(grid->GetCellsVector());
 
-    #pragma omp parallel for
     for (auto c = 0; c < cells.size(); c++)
     {
         auto cell = cells[c];
 
         if (cell->Boundary == Inflow)
         {
-            grid->AddParticle(cell);
+            grid->AddParticles(cell);
         }
     }
 }
@@ -249,9 +292,6 @@ void UpdateCellsWithParticles(Grid* grid)
 
     auto cells = *(grid->GetCellsVector());
 
-    int i, j, k;
-
-    #pragma omp parallel for
     for (auto c = 0; c < cells.size(); c++)
     {
         auto cell = cells[c];
@@ -264,7 +304,7 @@ void UpdateCellsWithParticles(Grid* grid)
         {
             auto particle = particles[p];
 
-            auto particleCell = grid->GetCellAtPixel(particle->X, particle->Y, particle->Z);
+            auto particleCell = grid->GetCellAtCoordinate(Coordinate{ particle->X, particle->Y, particle->Z });
 
             if (particleCell == cell)
                 isFull = true;
@@ -273,14 +313,17 @@ void UpdateCellsWithParticles(Grid* grid)
         if (cell->Type != Solid)
             cell->Type = isFull ? Full : Empty;
 
+        if (cell->Type == Empty)
+            cell->Pressure = ATM_PRESSURE;
+
         // If cell was deemed full, determine if it is a surface
         if (cell->Type != Full)
             continue;
 
-        auto index = grid->GetCellIndex(cell->X, cell->Y, cell->Z);
-        i = index[0];
-        j = index[1];
-        k = index[2];
+        int i, j, k;
+        i = cell->I;
+        j = cell->J;
+        k = cell->K;
 
         auto neighbors = {
             grid->GetCellAtIndex(i, j + 1, k),
@@ -309,9 +352,25 @@ void MoveParticles(Grid* grid)
     {
         auto particle = particles[p];
 
-        auto cell = grid->GetCellAtPixel(particle->X, particle->Y, particle->Z);
+        auto velocity = Helpers::ComputeParticleVelocity(grid, particle);
 
-        if (cell != nullptr)
-            particle->MoveBy(cell->U * dt, cell->V * dt, cell->W * dt);
+        particle->MoveBy(DT * velocity.U, DT * velocity.V, DT * velocity.W);
     }
+}
+
+void UpdateCellValues(Grid* grid)
+{
+    #pragma omp parallel for
+    for (auto c = 0; c < UpdatedCellValuesBuffer.size(); c++)
+    {
+        auto update = UpdatedCellValuesBuffer[c];
+
+        auto cell = grid->GetCellAtIndex(update.I, update.J, update.K);
+        cell->U = update.U;
+        cell->V = update.V;
+        cell->W = update.W;
+        cell->Pressure = update.Pressure;
+    }
+
+    UpdatedCellValuesBuffer.clear();
 }

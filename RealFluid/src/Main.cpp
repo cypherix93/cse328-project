@@ -4,11 +4,11 @@
 
 #include "App/Application/Application.h"
 
+extern Application* APPLICATION = new Application();
+
 int main(int argc, char** argv)
-{
-    Application app;
-    
-    app.Start();
+{    
+    APPLICATION->Start();
 
     return 0;
 }

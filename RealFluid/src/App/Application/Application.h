@@ -1,4 +1,5 @@
 #pragma once
+
 #include <iostream>
 #include <omp.h>
 #include "../../Core/Window/WindowManager/WindowManager.h"
@@ -14,7 +15,10 @@ class Application
     public:
     Application();
     virtual ~Application();
-    
+
+    // Getters
+    WindowManager* GetWindowManager() const;
+
     // Lifecycle Hooks
     void Setup();
     void Start();
@@ -22,3 +26,5 @@ class Application
     private:
     WindowManager* _WindowManager;
 };
+
+extern Application* APPLICATION;

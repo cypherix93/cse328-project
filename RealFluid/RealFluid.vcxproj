@@ -33,14 +33,17 @@
     <ClCompile Include="src\Core\Window\WindowManager\WindowManager.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Core\Helpers\GridHelper\GridHelper.h" />
     <ClInclude Include="src\Core\Helpers\NavierStokesHelper\NavierStokesHelper.h" />
     <ClInclude Include="src\Core\Fluid\Particle\Particle.h" />
-    <ClInclude Include="src\Core\Helpers\GridHelper\GridHelper.h" />
     <ClInclude Include="src\App\Drawing\GridDrawer\GridDrawer.h" />
     <ClInclude Include="src\Core\Fluid\Grid\Grid.h" />
     <ClInclude Include="src\Core\Fluid\Cell\FluidCell.h" />
     <ClInclude Include="src\App\Application\Application.h" />
     <ClInclude Include="src\App\Application\EventHandlers.h" />
+    <ClInclude Include="src\Core\Physics\Models\Coordinate.h" />
+    <ClInclude Include="src\Core\Physics\Models\Environment.h" />
+    <ClInclude Include="src\Core\Physics\Models\Velocity.h" />
     <ClInclude Include="src\Core\Physics\NavierStokesSolver\NavierStokesSolver.h" />
     <ClInclude Include="src\Core\StateManager\StateManager.h" />
     <ClInclude Include="src\Core\Window\WindowManager\WindowManager.h" />
@@ -104,7 +107,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>D:\src\cse328\cse328-project\RealFluid\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OpenMPSupport>true</OpenMPSupport>
     </ClCompile>
   </ItemDefinitionGroup>
@@ -113,6 +116,9 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <AdditionalIncludeDirectories>.\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OpenMPSupport>true</OpenMPSupport>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -122,6 +128,8 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>.\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OpenMPSupport>false</OpenMPSupport>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -135,6 +143,8 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>.\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OpenMPSupport>true</OpenMPSupport>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>

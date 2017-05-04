@@ -2,6 +2,7 @@
 
 #include <GL/glew.h>
 #include <vector>
+#include <Core/Physics/Models/Coordinate.h>
 
 using namespace std;
 
@@ -29,18 +30,19 @@ class FluidCell
     FluidCellType Type;
     BoundaryType Boundary;
 
-    int X, Y, Z;
-    int Width, Height, Depth;
+    float I, J, K;
+
+    float Width = 1.0f, Height = 1.0f, Depth = 1.0f;
 
     float U, V, W;
     float Pressure;
 
     // Getters
-    vector<int> GetPositionVector() const;
+    Coordinate GetCoordinates() const;
 
-    // Drawers
-    void DrawContents() const;
-    void DrawOutline() const;
-    void DrawVectors() const;
+    // Checkers
+    bool IsSolid() const;
+    bool IsEmpty() const;
+    bool IsFluid() const;
 };
 

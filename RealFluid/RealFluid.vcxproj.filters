@@ -80,10 +80,19 @@
     <ClInclude Include="src\Core\Fluid\Particle\Particle.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\Core\Helpers\NavierStokesHelper\NavierStokesHelper.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\Physics\Models\Coordinate.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\Physics\Models\Velocity.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="src\Core\Helpers\GridHelper\GridHelper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Core\Helpers\NavierStokesHelper\NavierStokesHelper.h">
+    <ClInclude Include="src\Core\Physics\Models\Environment.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

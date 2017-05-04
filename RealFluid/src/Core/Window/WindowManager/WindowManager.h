@@ -4,12 +4,14 @@
 #include <SDL.h>
 #include <functional>
 
-typedef std::function<void(void)> InitHandlerFunc;
-typedef std::function<void(void)> DrawHandlerFunc;
-typedef std::function<void(void)> UpdateHandlerFunc;
-typedef std::function<void(SDL_WindowEvent)> WindowHandlerFunc;
-typedef std::function<void(SDL_MouseButtonEvent)> MouseHandlerFunc;
-typedef std::function<void(SDL_KeyboardEvent)> KeyboardHandlerFunc;
+using namespace std;
+
+typedef function<void(void)> InitHandlerFunc;
+typedef function<void(void)> DrawHandlerFunc;
+typedef function<void(void)> UpdateHandlerFunc;
+typedef function<void(SDL_WindowEvent)> WindowHandlerFunc;
+typedef function<void(SDL_MouseButtonEvent)> MouseHandlerFunc;
+typedef function<void(SDL_KeyboardEvent)> KeyboardHandlerFunc;
 
 class WindowManager
 {
@@ -19,6 +21,7 @@ class WindowManager
 
     // Lifecycle functions
     void OpenWindow(std::string title, int width, int height);
+    void ResizeWindow(int width, int height);
     void Start(int fps = 30);
 
     // Event Handler Register functions

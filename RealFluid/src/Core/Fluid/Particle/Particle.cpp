@@ -1,6 +1,6 @@
 #include "Particle.h"
 
-Particle::Particle(int x, int y, int z)
+Particle::Particle(float x, float y, float z)
 {
     X = x;
     Y = y;
